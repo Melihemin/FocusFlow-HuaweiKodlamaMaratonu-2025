@@ -12,8 +12,8 @@ from sqlalchemy.orm import Session
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
+# Initialize FastAPI app
 app = FastAPI()
-
 
 # Function to get DB session
 def connect():
@@ -25,18 +25,17 @@ def connect():
 
 db_dependency = Annotated[Session, Depends(connect)]
 
+# Include routers
 app.include_router(main_router)
 app.include_router(platform_router)
 
 
-# Mount static files directory
+# Mount static files directory and set up templates directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Set up templates directory
 templates = Jinja2Templates(directory="templates")
 
-# To run: uvicorn server:app --reload
 
+# To run: uvicorn server:app --reload
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="localhost", port=8000)
