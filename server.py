@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from router.main import router as main_router
 from router.platform import router as platform_router
-from database.models import Base, Person
+from database.models import Base
 from database.settings import engine, SessionLocal
 from sqlalchemy.orm import Session
 
