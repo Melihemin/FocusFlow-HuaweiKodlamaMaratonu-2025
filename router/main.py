@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Request
 
 
-router = APIRouter(prefix="/", tags=["Home"])
+router = APIRouter(prefix="/home", tags=["Home"])
 
 
 @router.get("/", summary="Home Page")

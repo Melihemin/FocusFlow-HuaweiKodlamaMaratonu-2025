@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FocusFlow - Interactive Quiz</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f0f9ff",
+                        "background-dark": "#101c22",
+                        "foreground-light": "#111618",
+                        "foreground-dark": "#f0f3f4",
+                        "subtle-light": "#dbe2e6",
+                        "subtle-dark": "#2a3b43",
+                        "muted-light": "#617c89",
+                        "muted-dark": "#9ab0ba",
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.75rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    keyframes: {
+                        tada: {
+                            '0%': {
+                                transform: 'scale(1)'
+                            },
+                            '10%, 20%': {
+                                transform: 'scale(0.9) rotate(-3deg)'
+                            },
+                            '30%, 50%, 70%, 90%': {
+                                transform: 'scale(1.1) rotate(3deg)'
+                            },
+                            '40%, 60%, 80%': {
+                                transform: 'scale(1.1) rotate(-3deg)'
+                            },
+                            '100%': {
+                                transform: 'scale(1) rotate(0)'
+                            }
+                        },
+                        confetti: {
+                            '0%': {
+                                opacity: 1,
+                                transform: 'translateY(0) rotate(0deg)'
+                            },
+                            '100%': {
+                                opacity: 0,
+                                transform: 'translateY(200px) rotate(360deg)'
+                            }
+                        }
+                    },
+                    animation: {
+                        tada: 'tada 1s ease-in-out',
+                        confetti: 'confetti 2s ease-out forwards'
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .radio-custom:checked {
+            background-image: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27white%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3ccircle cx=%278%27 cy=%278%27 r=%273%27/%3e%3c/svg%3e');
+        }
+
+        .progress-bar-gradient {
+            background: linear-gradient(90deg, #f59e0b 0%, #22c55e 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-foreground-light dark:text-foreground-dark">
+    <div class="flex flex-col min-h-screen">
+        <header class="border-b border-subtle-light dark:border-subtle-dark">
+            <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="text-primary size-8">
+                        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+                                fill="currentColor"></path>
+                            <path clip-rule="evenodd"
+                                d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z"
+                                fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-bold">FocusFlow</h1>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                    <a class="hover:text-primary transition-colors" href="#">Home</a>
+                    <a class="text-primary font-semibold" href="#">Learn</a>
+                    <a class="hover:text-primary transition-colors" href="#">Community</a>
+                    <a class="hover:text-primary transition-colors" href="#">Resources</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="p-2 rounded-full hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVw8-2tl-NcdXUDm4gRJTyr2yceWKv98bZoTFXLCFmmh0YxevnNWFyeY_qVT873-KVVWNaSj-HCnOsZIMVrCYgLnOrE1-l9w3zW6vJw9hTyIpVid6dG5nJKWJ1dYMDHgaxUKVBWohlYGMKTXJMn8BDCPjkc3HUjbQZfW4JOlrEBQEbDgmQvEZDXB3ngPk_Ve71LyU1Z_bFFR2F7LzvA4PRhEU7DrSEubqUVYJAs7w6J659LMHO5XUayGq-b9YewQ_D3ExM5Dps37Va");'>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-base font-medium text-muted-light dark:text-muted-dark">Your Progress</p>
+                        <p class="text-base font-bold text-primary">Question 2 of 10</p>
+                    </div>
+                    <div class="w-full bg-subtle-light dark:bg-subtle-dark rounded-full h-5 shadow-inner">
+                        <div class="progress-bar-gradient h-5 rounded-full transition-all duration-500 ease-out"
+                            style="width: 20%"></div>
+                    </div>
+                </div>
+                <div class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden">
+                    <div class="absolute -top-16 -left-16 text-sky-100 dark:text-sky-900/50">
+                        <svg fill="none" height="300" viewBox="0 0 200 200" width="300"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="100" fill="currentColor" r="100"></circle>
+                        </svg>
+                    </div>
+                    <div class="absolute -bottom-20 -right-20 text-indigo-100 dark:text-indigo-900/50">
+                        <svg fill="none" height="300" viewBox="0 0 200 200" width="300"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M189.998 5.00214C195.311 8.93484 198.814 14.8211 199.803 21.3094C200.791 27.7977 199.213 34.4093 195.421 40.0021L115.421 180.002C111.629 185.595 105.748 189.201 99.2155 190.198C92.6829 191.196 86.0743 189.511 80.5977 185.578L5.59771 140.578C0.284988 136.646 -2.18187 130.417 -1.97495 123.957C-1.76802 117.498 1.09689 111.455 5.99771 107.002L125.998 7.00214C130.898 2.54921 137.382 0.354141 143.834 0.999941C150.285 1.64574 156.242 5.07494 160.473 10.4265L189.998 5.00214Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img alt="Brain character" class="w-20 h-20"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS4v43pK0zPRE6KmkDNuMXGP5bFdgOPdXW8uF0vM38iCNZ6UvaSLsb6FYUWCt2dnoHXvXlxUX6_VtnEkedgotrKxeRY3laPC9FCAGlo3hoNF0BA_Ee2okNWOyWibK6XimMVYBWJIxDx96JnzTexGMVS5P8BnTjLOY6usdzFxcYkKuQHCEtl672l8GU1agzeu5wYqyOgtgnVRN1MPDurkPtOGbpALT-CpLLh3lJ2VL2rIAmkOVoSb76Lub6d5irW5VI7TRSDn9YbexB" />
+                            <h2 class="text-3xl font-bold text-foreground-light dark:text-foreground-dark">What is a key
+                                feature of ADHD?</h2>
+                        </div>
+                        <form>
+                            <div class="space-y-4">
+                                <label
+                                    class="flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 cursor-pointer transition-all duration-200 hover:border-primary/50 transform hover:scale-105">
+                                    <input
+                                        class="radio-custom h-6 w-6 appearance-none rounded-full border-2 border-muted-light dark:border-muted-dark checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+                                        name="adhd-symptom" type="radio" />
+                                    <span class="ml-4 text-lg font-medium">Exceptional long-term memory</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 cursor-pointer transition-all duration-200 hover:border-primary/50 transform hover:scale-105">
+                                    <input
+                                        class="radio-custom h-6 w-6 appearance-none rounded-full border-2 border-muted-light dark:border-muted-dark checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+                                        name="adhd-symptom" type="radio" />
+                                    <span class="ml-4 text-lg font-medium">Difficulty sustaining attention</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 cursor-pointer transition-all duration-200 hover:border-primary/50 transform hover:scale-105">
+                                    <input
+                                        class="radio-custom h-6 w-6 appearance-none rounded-full border-2 border-muted-light dark:border-muted-dark checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+                                        name="adhd-symptom" type="radio" />
+                                    <span class="ml-4 text-lg font-medium">Aversion to colorful objects</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 cursor-pointer transition-all duration-200 hover:border-primary/50 transform hover:scale-105">
+                                    <input
+                                        class="radio-custom h-6 w-6 appearance-none rounded-full border-2 border-muted-light dark:border-muted-dark checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
+                                        name="adhd-symptom" type="radio" />
+                                    <span class="ml-4 text-lg font-medium">Speaking in a monotone voice</span>
+                                </label>
+                            </div>
+                            <div class="mt-8 flex justify-between items-center">
+                                <div
+                                    class="bg-success/10 border-2 border-success text-success rounded-lg p-4 flex items-center gap-3 animate-tada">
+                                    <span class="material-symbols-outlined text-3xl">celebration</span>
+                                    <div>
+                                        <p class="font-bold">That's right!</p>
+                                        <p class="text-sm">You're doing great!</p>
+                                    </div>
+                                </div>
+                                <button
+                                    class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                                    type="submit">
+                                    Next Question
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>
