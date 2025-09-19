@@ -7,8 +7,7 @@
     <title>Stitch Design</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -24,7 +23,12 @@
                     fontFamily: {
                         display: ["Lexend"],
                     },
-                    borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
                 },
             },
         };
@@ -64,6 +68,24 @@
                 <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Community</a>
             </nav>
             <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 rounded-lg bg-gray-200/50 dark:bg-gray-800/50 p-2">
+                    <div id="pomodoro-timer" class="text-center">
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Pomodoro: Work</p>
+                        <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">25:00</p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button id="pause-play-btn"
+                            class="flex h-6 w-6 items-center justify-center rounded-md bg-gray-300/50 dark:bg-gray-700/50 hover:bg-gray-300 dark:hover:bg-gray-700">
+                            <span
+                                class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">pause</span>
+                        </button>
+                        <button id="restart-btn"
+                            class="flex h-6 w-6 items-center justify-center rounded-md bg-gray-300/50 dark:bg-gray-700/50 hover:bg-gray-300 dark:hover:bg-gray-700">
+                            <span
+                                class="material-symbols-outlined text-base text-gray-600 dark:text-gray-300">restart_alt</span>
+                        </button>
+                    </div>
+                </div>
                 <button
                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200/50 dark:bg-gray-800/50 hover:bg-gray-200 dark:hover:bg-gray-800">
                     <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">notifications</span>
@@ -74,30 +96,34 @@
             </div>
         </header>
         <main class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mb-8">
+            <div class="mb-8 flex items-center justify-between">
                 <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
                     <ol class="flex items-center space-x-2">
-                        <li><a class="hover:text-primary dark:hover:text-primary" href="#">Units</a></li>
+                        <li>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Units</a>
+                        </li>
                         <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
-                        <li><a class="hover:text-primary dark:hover:text-primary" href="#">Unit 1: Introduction to
-                                Biology</a></li>
+                        <li>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Unit 1: Introduction to
+                                Biology</a>
+                        </li>
                         <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
                         <li class="font-medium text-gray-800 dark:text-gray-200">Topic 1: Cell Structure</li>
                     </ol>
                 </nav>
+                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="material-symbols-outlined text-base">timer</span>
+                    <span>Est. time remaining: 45 min</span>
+                </div>
             </div>
             <div class="mb-8">
-                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Topic 1: Cell Structure</h1>
-                <p class="mt-2 text-base text-gray-600 dark:text-gray-300">Explore the fundamental building blocks of
-                    life, focusing on the structure and function of cells.</p>
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Topic 1: </h1>
+                <p class="mt-2 text-base text-gray-600 dark:text-gray-300">x</p>
             </div>
             <div class="space-y-12">
                 <section>
                     <h2 class="text-2xl font-bold">Introduction</h2>
-                    <p class="mt-4 text-base leading-relaxed text-gray-700 dark:text-gray-300">Cells are the basic units
-                        of life, forming the foundation of all living organisms. Understanding their structure is
-                        crucial to grasping how they function. This topic will cover the key components of cells,
-                        including the nucleus, cytoplasm, and cell membrane, and their respective roles.</p>
+                    <p class="mt-4 text-base leading-relaxed text-gray-700 dark:text-gray-300">{{ response }}</p>
                 </section>
                 <section>
                     <h2 class="text-2xl font-bold">Key Components</h2>
@@ -105,7 +131,8 @@
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <span class="material-symbols-outlined text-3xl">grain</span></div>
+                                <span class="material-symbols-outlined text-3xl">grain</span>
+                            </div>
                             <div>
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Nucleus</h3>
                                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The control center of the cell,
@@ -115,7 +142,8 @@
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <span class="material-symbols-outlined text-3xl">water_drop</span></div>
+                                <span class="material-symbols-outlined text-3xl">water_drop</span>
+                            </div>
                             <div>
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Cytoplasm</h3>
                                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The jelly-like substance within
@@ -125,7 +153,8 @@
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <span class="material-symbols-outlined text-3xl">fullscreen</span></div>
+                                <span class="material-symbols-outlined text-3xl">fullscreen</span>
+                            </div>
                             <div>
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Cell Membrane</h3>
                                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The outer boundary of the cell,
@@ -170,7 +199,7 @@
                         </label>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button
+                        <button id="quiz-submit-btn"
                             class="flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark">Submit</button>
                     </div>
                 </section>
@@ -178,6 +207,147 @@
         </main>
     </div>
 
+    <div id="completion-popup"
+        class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-4">
+            <span class="material-symbols-outlined text-6xl text-green-500">task_alt</span>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Topic Completed!</h3>
+            <p class="text-gray-600 dark:text-gray-300">
+                You've successfully completed this topic in <strong id="time-spent" class="text-primary"></strong>.
+            </p>
+            <button id="continue-btn"
+                class="mt-4 w-full flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/80">
+                Continue to Next Topic
+            </button>
+        </div>
+    </div>
+
+
 </body>
+<script>
+    // --- POMODORO TIMER KODU ---
+    // DOM Elementlerini Seçme
+    const timerLabel = document.querySelector("#pomodoro-timer p:nth-child(1)");
+    const timerDisplay = document.querySelector("#pomodoro-timer p:nth-child(2)");
+    const pausePlayButton = document.getElementById("pause-play-btn");
+    const pausePlayIcon = pausePlayButton.querySelector("span");
+    const restartButton = document.getElementById("restart-btn");
+
+    // Zamanlayıcı Ayarları
+    const workDuration = 25 * 60; // 25 dakika (saniye cinsinden)
+    const breakDuration = 5 * 60; // 5 dakika (saniye cinsinden)
+
+    // Zamanlayıcı Durum Değişkenleri
+    let isWork = true;
+    let timeLeft = workDuration;
+    let isPaused = false;
+    let timerInterval = null;
+
+    function formatTime(seconds) {
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    function updateDisplay() {
+        timerDisplay.textContent = formatTime(timeLeft);
+        timerLabel.textContent = `Pomodoro: ${isWork ? "Work" : "Break"}`;
+        pausePlayIcon.textContent = isPaused ? "play_arrow" : "pause";
+    }
+
+    function startTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                isWork = !isWork;
+                timeLeft = isWork ? workDuration : breakDuration;
+            }
+            updateDisplay();
+        }, 1000);
+        isPaused = false;
+        updateDisplay();
+    }
+
+    function togglePausePlay() {
+        if (isPaused) {
+            startTimer();
+        } else {
+            clearInterval(timerInterval);
+            isPaused = true;
+            updateDisplay();
+        }
+    }
+
+    function restartTimer() {
+        clearInterval(timerInterval);
+        timeLeft = isWork ? workDuration : breakDuration;
+        startTimer();
+    }
+
+    pausePlayButton.addEventListener("click", togglePausePlay);
+    restartButton.addEventListener("click", restartTimer);
+
+    startTimer();
+    // --- POMODORO TIMER KODU SONU ---
+
+
+    // --- YENİ: QUIZ VE POPUP KODU ---
+    // Sayfa yüklendiğinde başlangıç zamanını kaydet
+    const pageLoadTime = new Date();
+
+    // Quiz ve Popup için gerekli DOM elementlerini seç
+    const quizSubmitButton = document.getElementById('quiz-submit-btn');
+    const completionPopup = document.getElementById('completion-popup');
+    const timeSpentElement = document.getElementById('time-spent');
+    const continueButton = document.getElementById('continue-btn');
+
+    // Milisaniyeyi "X dakika Y saniye" formatına çeviren fonksiyon
+    function formatTimeSpent(ms) {
+        const totalSeconds = Math.round(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        let result = "";
+        if (minutes > 0) {
+            result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        }
+        if (seconds > 0) {
+            if (minutes > 0) result += ", ";
+            result += `${seconds} second${seconds !== 1 ? 's' : ''}`;
+        }
+        // Eğer süre çok kısaysa (1 saniyeden az)
+        if (result === "") {
+            return "less than a second";
+        }
+        return result;
+    }
+
+    // Quiz'in Submit butonuna tıklandığında çalışacak olay
+    quizSubmitButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Butonun varsayılan davranışını engelle
+
+        // Geçen süreyi hesapla
+        const completionTime = new Date();
+        const timeDifference = completionTime - pageLoadTime;
+
+        // Popup'taki süreyi güncelle
+        timeSpentElement.textContent = formatTimeSpent(timeDifference);
+
+        // Popup'ı görünür yap
+        completionPopup.classList.remove('hidden');
+    });
+
+    // Popup'taki "Continue" butonuna tıklandığında çalışacak olay
+    continueButton.addEventListener('click', () => {
+        // Bir sonraki konunun URL'sine yönlendir.
+        // Şimdilik '#' olarak bırakıldı, gerçek URL ile değiştirin.
+        window.location.href = 'http://localhost:8000/education/lessons';
+    });
+</script>
 
 </html>

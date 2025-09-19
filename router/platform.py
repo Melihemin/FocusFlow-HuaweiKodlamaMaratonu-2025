@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from database.settings import SessionLocal
 from typing import Annotated
 from database.models import Lesson, User, User_statistics
+from rag.model import generate_explanation
 
 router = APIRouter(prefix="/education", tags=["Education Platform"])
 
@@ -39,5 +40,16 @@ async def get_lesson_detail(request: Request, lesson_id: int, db: db_dependency)
     return templates.TemplateResponse("lesson_detail.html", {"request": request, "lesson": lesson})
 
 @router.get("/lessons/{lesson_id}/unit/{unit_id}", summary="Education Platform Unit Lesson Detail Page")
-async def get_unit_lesson_detail(request: Request, unit_id: int, lesson_id: int):
-    return templates.TemplateResponse("unit_detail.html", {"request": request, "unit_id": unit_id, "lesson_id": lesson_id})
+async def get_unit_lesson_detail(request: Request, unit_id: int, lesson_id: int, db: db_dependency):
+
+    response = generate_explanation(lesson_id, unit_id, db)
+    print("Generated Explanation:", response)
+
+    return templates.TemplateResponse("unit_detail.html", {"request": request, "unit_id": unit_id, "lesson_id": lesson_id, "response": response})
+
+
+@router.get("/user/{user_id}/statistics", summary="Get User Learning Statistics")
+async def get_user_statistics(request: Request, user_id: int, db: db_dependency):
+
+
+    return templates.TemplateResponse("dashboard.html", {"request": request, "user_id": user_id})

@@ -88,6 +88,10 @@
         .progress-bar-gradient {
             background: linear-gradient(90deg, #f59e0b 0%, #22c55e 100%);
         }
+
+        #hint-modal:not(:target) {
+            display: none;
+        }
     </style>
 </head>
 
@@ -195,13 +199,20 @@
                                 </label>
                             </div>
                             <div class="mt-8 flex justify-between items-center">
-                                <div
-                                    class="bg-success/10 border-2 border-success text-success rounded-lg p-4 flex items-center gap-3 animate-tada">
-                                    <span class="material-symbols-outlined text-3xl">celebration</span>
-                                    <div>
-                                        <p class="font-bold">That's right!</p>
-                                        <p class="text-sm">You're doing great!</p>
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="bg-success/10 border-2 border-success text-success rounded-lg p-4 hidden md:flex items-center gap-3 animate-tada">
+                                        <span class="material-symbols-outlined text-3xl">celebration</span>
+                                        <div>
+                                            <p class="font-bold">That's right!</p>
+                                            <p class="text-sm">You're doing great!</p>
+                                        </div>
                                     </div>
+                                    <a class="bg-muted-light/20 dark:bg-muted-dark/20 text-muted-light dark:text-muted-dark font-semibold py-3 px-6 rounded-lg hover:bg-muted-light/30 dark:hover:bg-muted-dark/30 transition-all duration-300 flex items-center gap-2"
+                                        href="#hint-modal">
+                                        <span class="material-symbols-outlined">lightbulb</span>
+                                        AI Hint
+                                    </a>
                                 </div>
                                 <button
                                     class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -215,7 +226,49 @@
             </div>
         </main>
     </div>
-
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" id="hint-modal">
+        <div
+            class="bg-background-light dark:bg-background-dark rounded-xl shadow-2xl max-w-lg w-full p-8 relative border border-subtle-light dark:border-subtle-dark">
+            <a class="absolute top-4 right-4 text-muted-light dark:text-muted-dark hover:text-foreground-light dark:hover:text-foreground-dark transition-colors"
+                href="#">
+                <span class="material-symbols-outlined text-3xl">close</span>
+            </a>
+            <div class="flex items-center gap-4 mb-6">
+                <span class="material-symbols-outlined text-4xl text-primary">school</span>
+                <h3 class="text-2xl font-bold">Let's break it down!</h3>
+            </div>
+            <div class="space-y-4 text-muted-light dark:text-muted-dark">
+                <div class="flex items-start gap-4 p-4 bg-subtle-light/50 dark:bg-subtle-dark/30 rounded-lg">
+                    <div
+                        class="bg-primary text-white rounded-full size-8 flex-shrink-0 flex items-center justify-center font-bold text-sm">
+                        1</div>
+                    <p class="text-base">Think about what ADHD stands for. The "AD" part is a big clue! It stands for
+                        "Attention-Deficit".</p>
+                </div>
+                <div class="flex items-start gap-4 p-4 bg-subtle-light/50 dark:bg-subtle-dark/30 rounded-lg">
+                    <div
+                        class="bg-primary text-white rounded-full size-8 flex-shrink-0 flex items-center justify-center font-bold text-sm">
+                        2</div>
+                    <p class="text-base">Consider the options. Which one relates most closely to the idea of
+                        "Attention-Deficit"? Read each one carefully.</p>
+                </div>
+                <div class="flex items-start gap-4 p-4 bg-subtle-light/50 dark:bg-subtle-dark/30 rounded-lg">
+                    <div
+                        class="bg-primary text-white rounded-full size-8 flex-shrink-0 flex items-center justify-center font-bold text-sm">
+                        3</div>
+                    <p class="text-base">Eliminate the answers that seem unlikely. Does ADHD affect memory in the way
+                        described? Or how someone speaks? Focusing on the core symptom will lead you to the right
+                        answer.</p>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <a class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-all duration-300"
+                    href="#">
+                    Got it, thanks!
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
