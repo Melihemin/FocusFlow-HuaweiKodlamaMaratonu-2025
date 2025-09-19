@@ -1,3 +1,7 @@
 fastapi
 uvicorn
 jinja2
+sqlalchemy
+langchain
+python-dotenv
+pydantic
