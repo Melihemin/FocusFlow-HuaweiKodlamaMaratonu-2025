@@ -5,3 +5,4 @@ sqlalchemy
 langchain
 python-dotenv
 pydantic
+faiss-cpu
