@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -19,6 +20,10 @@
                         primary: "#13a4ec",
                         "background-light": "#f6f7f8",
                         "background-dark": "#101c22",
+                        // Added more colors for trackers
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
                     },
                     fontFamily: {
                         display: ["Lexend"],
@@ -29,6 +34,13 @@
                         xl: "0.75rem",
                         full: "9999px"
                     },
+                    // Added keyframes for focus alert
+                    keyframes: {
+                        pulse: { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.7 } }
+                    },
+                    animation: {
+                        pulse: 'pulse 1s infinite'
+                    }
                 },
             },
         };
@@ -40,6 +52,34 @@
 
         .radio-custom:checked {
             background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='%23ffffff' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        }
+
+        /* --- ADDED: STYLES FOR TRACKING FEATURES --- */
+        .focus-indicator { position: fixed; top: 20px; right: 20px; z-index: 1000; padding: 12px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display:flex; align-items:center; gap: 8px;}
+        .focus-good { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; color: #22c55e; }
+        .focus-warning { background: rgba(245, 158, 11, 0.1); border: 2px solid #f59e0b; color: #f59e0b; }
+        .focus-alert { background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; color: #ef4444; animation: pulse 1s infinite; }
+        
+        #calibration-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(16, 28, 34, 0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .calibration-dot { position: absolute; width: 20px; height: 20px; background: #13a4ec; border-radius: 50%; cursor: pointer; transition: transform 0.2s ease; box-shadow: 0 0 20px rgba(19, 164, 236, 0.5); }
+        .calibration-dot:hover { transform: scale(1.2); }
+        .calibration-dot.clicked { background: #22c55e; animation: calibration-click 0.3s ease; }
+        @keyframes calibration-click { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
+        
+        #webgazerVideoFeed, #webgazerFaceOverlay {
+            position: fixed !important;
+            top: 100px !important; /* Adjusted position */
+            right: 20px !important;
+            width: 180px !important; /* Adjusted size */
+            height: 135px !important;
+            border: 3px solid #13a4ec;
+            border-radius: 12px;
+            z-index: 999;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        #webgazerFaceFeedbackBox { 
+            display: none !important; 
         }
     </style>
 </head>
@@ -62,15 +102,15 @@
                 <h2 class="text-lg font-bold">FocusFlow</h2>
             </div>
             <nav class="flex items-center gap-8">
-                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Dashboard</a>
-                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Units</a>
-                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Resources</a>
-                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Community</a>
+                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Gösterge Paneli</a>
+                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Uniteler</a>
+                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Kaynaklar</a>
+                <a class="text-sm font-medium hover:text-primary dark:hover:text-primary" href="#">Topluluk</a>
             </nav>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-4 rounded-lg bg-gray-200/50 dark:bg-gray-800/50 p-2">
                     <div id="pomodoro-timer" class="text-center">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Pomodoro: Work</p>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Pomodoro:</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">25:00</p>
                     </div>
                     <div class="flex flex-col gap-1">
@@ -86,6 +126,10 @@
                         </button>
                     </div>
                 </div>
+                 <button id="eye-tracking-toggle" class="flex items-center gap-2 px-3 py-2 h-10 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium">
+                    <span class="material-symbols-outlined text-base">visibility</span>
+                    <span>Odaklanmayı Etkinleştir</span>
+                </button>
                 <button
                     class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200/50 dark:bg-gray-800/50 hover:bg-gray-200 dark:hover:bg-gray-800">
                     <span class="material-symbols-outlined text-gray-600 dark:text-gray-300">notifications</span>
@@ -100,54 +144,57 @@
                 <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
                     <ol class="flex items-center space-x-2">
                         <li>
-                            <a class="hover:text-primary dark:hover:text-primary" href="#">Units</a>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Uniteler</a>
                         </li>
                         <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
                         <li>
-                            <a class="hover:text-primary dark:hover:text-primary" href="#">Unit 1: Introduction to
-                                Biology</a>
+                            <a class="hover:text-primary dark:hover:text-primary" href="#">Unite 1</a>
                         </li>
                         <li><span class="material-symbols-outlined text-base">chevron_right</span></li>
-                        <li class="font-medium text-gray-800 dark:text-gray-200">Topic 1: Cell Structure</li>
+                        <li class="font-medium text-gray-800 dark:text-gray-200">Konu 1: {{ lesson.title }}</li>
                     </ol>
                 </nav>
-                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="material-symbols-outlined text-base">timer</span>
-                    <span>Est. time remaining: 45 min</span>
+                 <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex items-center gap-1" title="Tab Switches">
+                        <span class="material-symbols-outlined text-base">tab_move</span>
+                        <span id="tab-switch-counter">Sekme Değiştirme: 0</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base">timer</span>
+                        <span>Tahmini Süre: 10 dk</span>
+                    </div>
                 </div>
             </div>
             <div class="mb-8">
-                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Topic 1: </h1>
-                <p class="mt-2 text-base text-gray-600 dark:text-gray-300">x</p>
+                <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">Konu 1: {{ lesson.title }}</h1>
+                <p class="mt-2 text-base text-gray-600 dark:text-gray-300">Geometriye giriş dersine hoşgeldin!</p>
             </div>
             <div class="space-y-12">
                 <section>
-                    <h2 class="text-2xl font-bold">Introduction</h2>
+                    <h2 class="text-2xl font-bold">Giriş</h2>
                     <p class="mt-4 text-base leading-relaxed text-gray-700 dark:text-gray-300">{{ response }}</p>
                 </section>
                 <section>
-                    <h2 class="text-2xl font-bold">Key Components</h2>
+                    <h2 class="text-2xl font-bold">Anahtar Kelimeler</h2>
                     <div class="mt-6 space-y-4">
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <span class="material-symbols-outlined text-3xl">grain</span>
+                                <span class="material-symbols-outlined text-3xl">book</span>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Nucleus</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The control center of the cell,
-                                    containing DNA and regulating cell activities.</p>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Nokta</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Nokta, geometride boyutsuz olarak ifade edilen; eni, boyu ve derinliği olmayan bir terimdir.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
                             <div
                                 class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                <span class="material-symbols-outlined text-3xl">water_drop</span>
+                                <span class="material-symbols-outlined text-3xl">note</span>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Cytoplasm</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The jelly-like substance within
-                                    the cell, housing organelles and facilitating cellular processes.</p>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Çizgi</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Çizgiler, iki, üç veya daha yüksek boyutlu uzaylara gömülebilen bir boyutlu uzaylardır.</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4 rounded-lg bg-white/50 dark:bg-gray-900/30 p-4">
@@ -156,24 +203,22 @@
                                 <span class="material-symbols-outlined text-3xl">fullscreen</span>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-900 dark:text-white">Cell Membrane</h3>
-                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">The outer boundary of the cell,
-                                    controlling the movement of substances in and out.</p>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Düzlem</h3>
+                                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Uzayda bulunan bir doğrunun yön değiştirmeden ve kendi doğrultusunda olmayan hareketiyle meydana getireceği kabul edilen yüzeylere denir.</p>
                             </div>
                         </div>
                     </div>
                 </section>
                 <section>
-                    <h2 class="text-2xl font-bold">Visual Aid</h2>
+                    <h2 class="text-2xl font-bold">Senin için önerdiğimiz:</h2>
+                    <b><p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Bu seçim senin ortalama odak sürene, eksiklerine, ağırlıklı olarak seçtiğin öğrenme tarzına göre yapıldı.</p></b>
+                            
                     <div class="mt-6 aspect-[3/2] w-full overflow-hidden rounded-lg">
-                        <div class="h-full w-full bg-cover bg-center"
-                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCHsim_ujtiacQdKgeeC3Zg1OGthZehVB1ucNwVUxfbsEEGjw6NoNccP6-TV-rt7BpokTZ1WaKGRPnWal4kiXPXkrBD5wxNpjhpbt9Caih8VCBiJwboNZ1HCgXZJoo1MmVrdSbaA5r7gJtniyNi-pN-o-qezWsdMWBscBaU5NQNn7g7I9LlIPf7oogesxccw-7iAO75AGJ_cQ9tkr_Nbvb2LucHqdgMPQiL4sVeHwXS-FmPelO3-IUDfQuCJhY_E3JCV3ZdKXewx8Iu");'>
-                        </div>
-                    </div>
+                        <iframe width="850" height="600" src="https://www.youtube.com/embed/bAcjMIdtt9k?si=X8SA5u-9HqhHnFfc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
                 </section>
                 <section>
-                    <h2 class="text-2xl font-bold">Interactive Quiz</h2>
-                    <p class="mt-2 text-base text-gray-600 dark:text-gray-300">What is the control center of the cell?
+                    <h2 class="text-2xl font-bold">Odak Testi</h2>
+                    <p class="mt-2 text-base text-gray-600 dark:text-gray-300">Noktanın en önemli özelliği nedir?
                     </p>
                     <div class="mt-6 space-y-3">
                         <label
@@ -181,21 +226,21 @@
                             <input
                                 class="radio-custom h-5 w-5 appearance-none rounded-full border-2 border-gray-300 dark:border-gray-600 bg-transparent checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
                                 name="quiz-option" type="radio" />
-                            <span class="font-medium text-gray-800 dark:text-gray-200">Nucleus</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">A ve B noktalarını birleştirir.</span>
                         </label>
                         <label
                             class="flex cursor-pointer items-center gap-4 rounded-lg border border-gray-300 dark:border-gray-700 p-4 has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary/50">
                             <input
                                 class="radio-custom h-5 w-5 appearance-none rounded-full border-2 border-gray-300 dark:border-gray-600 bg-transparent checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
                                 name="quiz-option" type="radio" />
-                            <span class="font-medium text-gray-800 dark:text-gray-200">Cytoplasm</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">Sonsuz olması.</span>
                         </label>
                         <label
                             class="flex cursor-pointer items-center gap-4 rounded-lg border border-gray-300 dark:border-gray-700 p-4 has-[:checked]:border-primary has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary/50">
                             <input
                                 class="radio-custom h-5 w-5 appearance-none rounded-full border-2 border-gray-300 dark:border-gray-600 bg-transparent checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark"
                                 name="quiz-option" type="radio" />
-                            <span class="font-medium text-gray-800 dark:text-gray-200">Cell Membrane</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">Cümleyi bitirmesi.</span>
                         </label>
                     </div>
                     <div class="mt-6 flex justify-end">
@@ -212,33 +257,47 @@
         <div
             class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-sm w-full text-center flex flex-col items-center gap-4">
             <span class="material-symbols-outlined text-6xl text-green-500">task_alt</span>
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Topic Completed!</h3>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Konu Tamamlandı!</h3>
             <p class="text-gray-600 dark:text-gray-300">
-                You've successfully completed this topic in <strong id="time-spent" class="text-primary"></strong>.
+               Konuyu şu sürede başarıyla tamamladın. <strong id="time-spent" class="text-primary"></strong>. Odak puanın: <strong id="focus-score" class="text-primary">87</strong>. Bravo!
             </p>
+            <a href="http://localhost:8000/education/quiz/1">
             <button id="continue-btn"
                 class="mt-4 w-full flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary/80">
-                Continue to Next Topic
-            </button>
+                Deneme sınavına geç
+            </button></a>
+        </div>
+    </div>
+    
+    <div id="focus-indicator" class="focus-indicator" style="display: none;"><span id="focus-text"></span></div>
+    <canvas id="gaze-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 998; display: none;"></canvas>
+    <div id="calibration-modal" style="display: none;">
+        <div class="bg-background-light dark:bg-background-dark rounded-xl p-8 text-center max-w-lg mx-4">
+            <h3 class="text-2xl font-bold mb-4">🎯 Eye Tracking Setup</h3>
+            <div id="calibration-area" class="relative w-80 h-60 mx-auto mb-6 bg-gray-200/50 dark:bg-gray-800/50 rounded-lg" style="display: none;"></div>
+            <div id="setup-options">
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Choose a method to monitor focus.</p>
+                <div class="flex gap-4 justify-center">
+                    <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"><span class="material-symbols-outlined">videocam</span> Use Webcam</button>
+                    <button id="skip-calibration" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:opacity-80 flex items-center gap-2"><span class="material-symbols-outlined">mouse</span> Use Mouse</button>
+                </div>
+            </div>
         </div>
     </div>
 
 
 </body>
 <script>
-    // --- POMODORO TIMER KODU ---
-    // DOM Elementlerini Seçme
+    // --- POMODORO TIMER CODE ---
     const timerLabel = document.querySelector("#pomodoro-timer p:nth-child(1)");
     const timerDisplay = document.querySelector("#pomodoro-timer p:nth-child(2)");
     const pausePlayButton = document.getElementById("pause-play-btn");
     const pausePlayIcon = pausePlayButton.querySelector("span");
     const restartButton = document.getElementById("restart-btn");
 
-    // Zamanlayıcı Ayarları
-    const workDuration = 25 * 60; // 25 dakika (saniye cinsinden)
-    const breakDuration = 5 * 60; // 5 dakika (saniye cinsinden)
+    const workDuration = 25 * 60;
+    const breakDuration = 5 * 60;
 
-    // Zamanlayıcı Durum Değişkenleri
     let isWork = true;
     let timeLeft = workDuration;
     let isPaused = false;
@@ -257,9 +316,7 @@
     }
 
     function startTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
+        if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
@@ -274,13 +331,8 @@
     }
 
     function togglePausePlay() {
-        if (isPaused) {
-            startTimer();
-        } else {
-            clearInterval(timerInterval);
-            isPaused = true;
-            updateDisplay();
-        }
+        if (isPaused) startTimer();
+        else { clearInterval(timerInterval); isPaused = true; updateDisplay(); }
     }
 
     function restartTimer() {
@@ -293,60 +345,80 @@
     restartButton.addEventListener("click", restartTimer);
 
     startTimer();
-    // --- POMODORO TIMER KODU SONU ---
+    // --- POMODORO TIMER END ---
+    
+    // --- ADDED: EYE TRACKING ---
+    class EyeTracking {
+        constructor() { this.isEnabled = false; this.trackingMode = 'none'; this.focusArea = null; this.focusStatus = 'good'; this.offFocusStartTime = null; this.focusCheckInterval = null; this.lastPrediction = null; this.animationFrame = null; this.canvas = document.getElementById('gaze-canvas'); this.ctx = this.canvas.getContext('2d'); this.initializeElements(); this.bindEvents(); this.setupCanvas(); }
+        initializeElements() { this.toggleButton = document.getElementById('eye-tracking-toggle'); this.focusIndicator = document.getElementById('focus-indicator'); this.focusText = document.getElementById('focus-text'); this.calibrationModal = document.getElementById('calibration-modal'); this.calibrationArea = document.getElementById('calibration-area'); this.startCalibrationBtn = document.getElementById('start-calibration'); this.skipCalibrationBtn = document.getElementById('skip-calibration'); this.setupOptions = document.getElementById('setup-options'); }
+        bindEvents() { this.toggleButton.addEventListener('click', () => this.isEnabled ? this.disable() : this.enable()); this.startCalibrationBtn.addEventListener('click', () => this.startWebcamCalibration()); this.skipCalibrationBtn.addEventListener('click', () => this.enableMouseTracking()); window.addEventListener('resize', () => { this.resizeCanvas(); this.updateFocusArea(); }); }
+        setupCanvas() { this.resizeCanvas(); }
+        resizeCanvas() { const dpr = window.devicePixelRatio || 1; this.canvas.width = window.innerWidth * dpr; this.canvas.height = window.innerHeight * dpr; this.canvas.style.width = `${window.innerWidth}px`; this.canvas.style.height = `${window.innerHeight}px`; this.ctx.scale(dpr, dpr); }
+        enable() { this.calibrationModal.style.display = 'flex'; this.setupOptions.style.display = 'block'; this.calibrationArea.style.display = 'none'; }
+        async startWebcamCalibration() { this.setupOptions.style.display = 'none'; this.calibrationArea.style.display = 'block'; try { await webgazer.setGazeListener((data, ts) => this.handleGazeData(data)).showPredictionPoints(true).begin(); await this.runCalibration(); } catch (error) { console.error('Calibration Error:', error); alert('Could not start eye tracking. Ensure camera access is granted. Switching to mouse mode.'); this.enableMouseTracking(); } }
+        runCalibration() { return new Promise(resolve => { const points = [{ x: 50, y: 50 }, { x: 250, y: 50 }, { x: 150, y: 120 }, { x: 50, y: 190 }, { x: 250, y: 190 }]; let current = 0; this.calibrationArea.innerHTML = ''; const nextPoint = () => { if (current >= points.length) { this.finishCalibration(); resolve(); return; } const p = points[current]; const dot = document.createElement('div'); dot.className = 'calibration-dot'; dot.style.left = `${p.x - 10}px`; dot.style.top = `${p.y - 10}px`; this.calibrationArea.appendChild(dot); dot.onclick = () => { dot.classList.add('clicked'); setTimeout(() => { this.calibrationArea.innerHTML = ''; current++; nextPoint(); }, 300); }; }; nextPoint(); }); }
+        async enableMouseTracking() { this.trackingMode = 'mouse'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); document.addEventListener('mousemove', this.handleMouseMove); this.setFocusStatus('warning', 'Mouse Tracking 🖱️'); }
+        finishCalibration() { webgazer.showPredictionPoints(false); this.trackingMode = 'webcam'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); this.setFocusStatus('good', 'Eye Tracking 👁️'); }
+        enableSharedTracking() { this.isEnabled = true; this.focusIndicator.style.display = 'flex'; this.canvas.style.display = 'block'; this.updateButtonState('disable'); this.updateFocusArea(); this.focusCheckInterval = setInterval(() => this.checkFocus(), 500); this.startRendering(); }
+        disable() { this.isEnabled = false; this.focusIndicator.style.display = 'none'; this.canvas.style.display = 'none'; this.updateButtonState('enable'); if (this.focusCheckInterval) clearInterval(this.focusCheckInterval); if (this.animationFrame) cancelAnimationFrame(this.animationFrame); if (typeof webgazer !== 'undefined' && webgazer.isReady()) webgazer.end(); document.removeEventListener('mousemove', this.handleMouseMove); this.trackingMode = 'none'; }
+        updateButtonState(state) { if (state === 'disable') { this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility_off</span><span>Disable Focus</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-primary\/\d+|text-primary|hover:bg-primary\/\d+/g, '') + ' bg-danger/10 text-danger hover:bg-danger/20'; } else { this.toggleButton.innerHTML = `<span class="material-symbols-outlined text-base">visibility</span><span>Enable Focus</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-danger\/\d+|text-danger|hover:bg-danger\/\d+/g, '') + ' bg-primary/10 text-primary hover:bg-primary/20'; } }
+        handleMouseMove = (e) => { this.handleGazeData({ x: e.clientX, y: e.clientY }); };
+        handleGazeData(data) { if (!this.isEnabled || !data) return; this.lastPrediction = data; }
+        startRendering() { if (this.animationFrame) cancelAnimationFrame(this.animationFrame); const render = () => { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); if (this.isEnabled && this.lastPrediction) { this.drawGaze(); } this.animationFrame = requestAnimationFrame(render); }; this.animationFrame = requestAnimationFrame(render); }
+        drawGaze() { const p = this.lastPrediction; this.ctx.fillStyle = 'rgba(19, 164, 236, 0.8)'; this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI); this.ctx.fill(); }
+        updateFocusArea() { const mainElement = document.querySelector('main'); if (mainElement) { const rect = mainElement.getBoundingClientRect(); this.focusArea = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }; } }
+        checkFocus() { if (!this.isEnabled || !this.focusArea || !this.lastPrediction) { if (this.isEnabled) this.setFocusStatus('alert', 'No Data'); return; } const p = this.lastPrediction; const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right && p.y >= this.focusArea.top && p.y <= this.focusArea.bottom); if (isFocused) { this.setFocusStatus('good', this.trackingMode === 'webcam' ? 'Eye Tracking 👁️' : 'Mouse Tracking 🖱️'); this.offFocusStartTime = null; } else { if (!this.offFocusStartTime) this.offFocusStartTime = Date.now(); if (Date.now() - this.offFocusStartTime > 3000) { this.setFocusStatus('alert', 'Refocus!'); } else { this.setFocusStatus('warning', 'Distracted...'); } } }
+        setFocusStatus(status, text) { if (this.focusStatus === status) return; this.focusStatus = status; this.focusText.textContent = text; this.focusIndicator.className = `focus-indicator focus-${status}`; }
+    }
+    const eyeTracking = new EyeTracking();
+    
+    // --- ADDED: TAB SWITCH COUNTER ---
+    const tabSwitchCounterElement = document.getElementById('tab-switch-counter');
+    let tabSwitchCount = 0;
+
+    function handleVisibilityChange() {
+        if (document.hidden) {
+            tabSwitchCount++;
+            tabSwitchCounterElement.textContent = tabSwitchCount;
+        }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
 
-    // --- YENİ: QUIZ VE POPUP KODU ---
-    // Sayfa yüklendiğinde başlangıç zamanını kaydet
+    // --- MODIFIED: QUIZ AND POPUP CODE ---
     const pageLoadTime = new Date();
-
-    // Quiz ve Popup için gerekli DOM elementlerini seç
     const quizSubmitButton = document.getElementById('quiz-submit-btn');
     const completionPopup = document.getElementById('completion-popup');
     const timeSpentElement = document.getElementById('time-spent');
     const continueButton = document.getElementById('continue-btn');
 
-    // Milisaniyeyi "X dakika Y saniye" formatına çeviren fonksiyon
     function formatTimeSpent(ms) {
         const totalSeconds = Math.round(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-
         let result = "";
-        if (minutes > 0) {
-            result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
-        }
-        if (seconds > 0) {
-            if (minutes > 0) result += ", ";
-            result += `${seconds} second${seconds !== 1 ? 's' : ''}`;
-        }
-        // Eğer süre çok kısaysa (1 saniyeden az)
-        if (result === "") {
-            return "less than a second";
-        }
-        return result;
+        if (minutes > 0) result += `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        if (seconds > 0) { if (minutes > 0) result += ", "; result += `${seconds} second${seconds !== 1 ? 's' : ''}`; }
+        return result === "" ? "less than a second" : result;
     }
 
-    // Quiz'in Submit butonuna tıklandığında çalışacak olay
     quizSubmitButton.addEventListener('click', (event) => {
-        event.preventDefault(); // Butonun varsayılan davranışını engelle
+        event.preventDefault();
 
-        // Geçen süreyi hesapla
+        // Stop trackers
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        if (eyeTracking.isEnabled) {
+            eyeTracking.disable();
+        }
+
         const completionTime = new Date();
         const timeDifference = completionTime - pageLoadTime;
-
-        // Popup'taki süreyi güncelle
         timeSpentElement.textContent = formatTimeSpent(timeDifference);
-
-        // Popup'ı görünür yap
         completionPopup.classList.remove('hidden');
     });
 
-    // Popup'taki "Continue" butonuna tıklandığında çalışacak olay
     continueButton.addEventListener('click', () => {
-        // Bir sonraki konunun URL'sine yönlendir.
-        // Şimdilik '#' olarak bırakıldı, gerçek URL ile değiştirin.
-        window.location.href = 'http://localhost:8000/education/lessons';
+        window.location.href = '#'; // Replace with your next topic URL
     });
 </script>
 

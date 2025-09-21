@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FocusFlow - Interactive Quiz</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webgazer/2.0.0/webgazer.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f0f9ff",
+                        "background-dark": "#101c22",
+                        "foreground-light": "#111618",
+                        "foreground-dark": "#f0f3f4",
+                        "subtle-light": "#dbe2e6",
+                        "subtle-dark": "#2a3b43",
+                        "muted-light": "#617c89",
+                        "muted-dark": "#9ab0ba",
+                        "success": "#22c55e",
+                        "warning": "#f59e0b",
+                        "danger": "#ef4444"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.75rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    keyframes: {
+                        tada: {
+                            '0%': { transform: 'scale(1)' },
+                            '10%, 20%': { transform: 'scale(0.9) rotate(-3deg)' },
+                            '30%, 50%, 70%, 90%': { transform: 'scale(1.1) rotate(3deg)' },
+                            '40%, 60%, 80%': { transform: 'scale(1.1) rotate(-3deg)' },
+                            '100%': { transform: 'scale(1) rotate(0)' }
+                        },
+                        confetti: {
+                            '0%': { opacity: 1, transform: 'translateY(0) rotate(0deg)' },
+                            '100%': { opacity: 0, transform: 'translateY(200px) rotate(360deg)' }
+                        }
+                    },
+                    animation: {
+                        tada: 'tada 1s ease-in-out',
+                        confetti: 'confetti 2s ease-out forwards'
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+
+        .radio-custom:checked {
+            background-image: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27white%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3ccircle cx=%278%27 cy=%278%27 r=%273%27/%3e%3c/svg%3e');
+        }
+
+        .progress-bar-gradient {
+            background: linear-gradient(90deg, #f59e0b 0%, #22c55e 100%);
+        }
+
+        /* Hide feedback messages by default */
+        #feedback-correct,
+        #feedback-incorrect {
+            display: none;
+        }
+
+        /* Eye tracking styles */
+        .focus-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .focus-good {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid #22c55e;
+            color: #22c55e;
+        }
+
+        .focus-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid #f59e0b;
+            color: #f59e0b;
+        }
+
+        .focus-alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .gaze-dot {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(19, 164, 236, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            transition: all 0.1s ease;
+        }
+
+        /* Canvas optimizations */
+        #gaze-canvas {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        /* Focus area highlight */
+        .focus-area-highlight {
+            position: absolute;
+            border: 3px solid rgba(19, 164, 236, 0.3);
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: 997;
+            transition: all 0.3s ease;
+        }
+
+        /* Performance optimizations */
+        .quiz-container-focused {
+            transform: translateZ(0);
+            will-change: transform, box-shadow;
+        }
+
+        #calibration-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .calibration-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #13a4ec;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            box-shadow: 0 0 20px rgba(19, 164, 236, 0.5);
+        }
+
+        .calibration-dot:hover {
+            transform: scale(1.2);
+        }
+
+        .calibration-dot.clicked {
+            background: #22c55e;
+            animation: calibration-click 0.3s ease;
+        }
+
+        @keyframes calibration-click {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+
+        /* Webcam video container */
+        .webcam-container {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(19, 164, 236, 0.3);
+            border-radius: 12px;
+            z-index: 1001;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .webcam-container.active {
+            border-color: #13a4ec;
+            box-shadow: 0 0 20px rgba(19, 164, 236, 0.3);
+        }
+
+        .webcam-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .webcam-status {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        /* Hide WebGazer's default elements */
+        #webgazerVideoFeed {
+            display: none !important;
+        }
+        
+        #webgazerFaceOverlay {
+            display: none !important;
+        }
+        
+        #webgazerFaceFeedbackBox {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-foreground-light dark:text-foreground-dark">
+    <div class="flex flex-col min-h-screen">
+        <header class="border-b border-subtle-light dark:border-subtle-dark">
+            <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="text-primary size-8">
+                        <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z"
+                                fill="currentColor"></path>
+                            <path clip-rule="evenodd"
+                                d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z"
+                                fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-bold">FocusFlow</h1>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                    <a class="hover:text-primary transition-colors" href="#">Home</a>
+                    <a class="text-primary font-semibold" href="#">Learn</a>
+                    <a class="hover:text-primary transition-colors" href="#">Community</a>
+                    <a class="hover:text-primary transition-colors" href="#">Resources</a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="eye-tracking-toggle" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium">
+                        <span class="material-symbols-outlined">visibility</span>
+                        <span>Enable Focus Tracking</span>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-subtle-light dark:hover:bg-subtle-dark transition-colors">
+                        <svg fill="currentColor" height="20" viewBox="0 0 256 256" width="20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("https://source.unsplash.com/random/100x100?face");'>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-base font-medium text-muted-light dark:text-muted-dark">Your Progress</p>
+                        <p id="question-counter" class="text-base font-bold text-primary">Question 1 of 10</p>
+                    </div>
+                    <div class="w-full bg-subtle-light dark:bg-subtle-dark rounded-full h-5 shadow-inner">
+                        <div id="progress-bar"
+                            class="progress-bar-gradient h-5 rounded-full transition-all duration-500 ease-out"
+                            style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <div id="quiz-container"
+                    class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden">
+                    <div class="absolute -top-16 -left-16 text-sky-100 dark:text-sky-900/50">
+                        <svg fill="none" height="300" viewBox="0 0 200 200" width="300"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="100" cy="100" fill="currentColor" r="100"></circle>
+                        </svg>
+                    </div>
+                    <div class="absolute -bottom-20 -right-20 text-indigo-100 dark:text-indigo-900/50">
+                        <svg fill="none" height="300" viewBox="0 0 200 200" width="300"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M189.998 5.00214C195.311 8.93484 198.814 14.8211 199.803 21.3094C200.791 27.7977 199.213 34.4093 195.421 40.0021L115.421 180.002C111.629 185.595 105.748 189.201 99.2155 190.198C92.6829 191.196 86.0743 189.511 80.5977 185.578L5.59771 140.578C0.284988 136.646 -2.18187 130.417 -1.97495 123.957C-1.76802 117.498 1.09689 111.455 5.99771 107.002L125.998 7.00214C130.898 2.54921 137.382 0.354141 143.834 0.999941C150.285 1.64574 156.242 5.07494 160.473 10.4265L189.998 5.00214Z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-4 mb-6">
+                            <img alt="Brain character" class="w-20 h-20"
+                                src="https://em-content.zobj.net/source/microsoft-teams/363/brain_1f9e0.png" />
+                            <h2 id="question-text" class="text-3xl font-bold text-foreground-light dark:text-foreground-dark">
+                                What is a key feature of ADHD?
+                            </h2>
+                        </div>
+                        <form id="quiz-form">
+                            <div id="options-container" class="space-y-4">
+                            </div>
+                            <div class="mt-8 flex justify-between items-center">
+                                <div class="flex items-center gap-2 min-h-[72px]">
+                                    <div id="feedback-correct"
+                                        class="bg-success/10 border-2 border-success text-success rounded-lg p-4 flex items-center gap-3 animate-tada">
+                                        <span class="material-symbols-outlined text-3xl">celebration</span>
+                                        <div>
+                                            <p class="font-bold">That's right!</p>
+                                            <p class="text-sm">You're doing great!</p>
+                                        </div>
+                                    </div>
+                                    <div id="feedback-incorrect"
+                                        class="bg-danger/10 border-2 border-danger text-danger rounded-lg p-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-3xl">error</span>
+                                        <div>
+                                            <p class="font-bold">Not quite.</p>
+                                            <p class="text-sm">Let's try the next one!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button id="next-question-btn" type="submit"
+                                    class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                    Next Question
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="results-container"
+                    class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden text-center"
+                    style="display: none;">
+                    <div class="relative z-10">
+                        <h2 class="text-4xl font-bold mb-4">Quiz Complete!</h2>
+                        <p class="text-xl text-muted-light dark:text-muted-dark mb-6">You've done a fantastic job!</p>
+                        <p class="text-6xl font-black text-primary mb-8" id="final-score">8/10</p>
+                        <button id="restart-quiz-btn"
+                            class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Focus tracking indicator -->
+        <div id="focus-indicator" class="focus-indicator focus-good" style="display: none;">
+            <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 4px;">visibility</span>
+            <span id="focus-text">Focus: Good</span>
+        </div>
+
+        <!-- Webcam video container -->
+        <div id="webcam-container" class="webcam-container" style="display: none;">
+            <video id="webcam-video" autoplay muted></video>
+            <div id="webcam-status" class="webcam-status">Camera Off</div>
+        </div>
+
+        <!-- Optimized Canvas for gaze visualization -->
+        <canvas id="gaze-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 998; display: none;"></canvas>
+
+        <!-- Gaze dot (fallback) -->
+        <div id="gaze-dot" class="gaze-dot" style="display: none;"></div>
+
+        <!-- Calibration modal -->
+        <div id="calibration-modal" style="display: none;">
+            <div class="bg-white dark:bg-subtle-dark rounded-xl p-8 text-center max-w-lg mx-4">
+                <h3 class="text-2xl font-bold mb-4">🎯 Eye Tracking Setup</h3>
+                <p class="text-muted-light dark:text-muted-dark mb-6">
+                    Choose your tracking method to help monitor focus during the quiz.
+                </p>
+                <div class="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-primary">
+                        📹 <strong>Webcam:</strong> Uses your camera for accurate eye tracking<br>
+                        🖱️ <strong>Mouse:</strong> Simpler fallback using mouse movement
+                    </p>
+                </div>
+                <div id="calibration-area" class="relative w-80 h-60 mx-auto mb-6 bg-subtle-light dark:bg-subtle-dark rounded-lg" style="display: none;">
+                    <div id="calibration-instructions" class="absolute inset-0 flex items-center justify-center text-center p-4">
+                        <div>
+                            <h4 class="font-bold mb-2">Calibration Required</h4>
+                            <p class="text-sm">Click on each blue dot while looking directly at it</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 justify-center">
+                    <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined">videocam</span>
+                        Use Webcam
+                    </button>
+                    <button id="skip-calibration" class="bg-muted-light dark:bg-muted-dark text-white px-6 py-2 rounded-lg hover:opacity-80 transition-opacity flex items-center gap-2">
+                        <span class="material-symbols-outlined">mouse</span>
+                        Use Mouse
+                    </button>
+                </div>
+                <div class="mt-4 text-xs text-center">
+                    <button id="test-camera" class="text-primary hover:underline">Test Camera Access</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is a key feature of ADHD?",
+                options: ["Exceptional long-term memory", "Difficulty sustaining attention", "Aversion to colorful objects", "Speaking in a monotone voice"],
+                answer: "Difficulty sustaining attention"
+            },
+            {
+                question: "The 'H' in ADHD stands for which of the following?",
+                options: ["Hyper-focus", "Hypersensitivity", "Hyperactivity", "Honesty"],
+                answer: "Hyperactivity"
+            },
+            {
+                question: "Which of these is a common strategy for managing ADHD symptoms?",
+                options: ["Avoiding all forms of sugar", "Creating structured routines", "Sleeping more than 10 hours", "Working in a loud environment"],
+                answer: "Creating structured routines"
+            },
+            {
+                question: "ADHD is primarily a disorder related to:",
+                options: ["Physical strength", "Visual acuity", "Executive functions", "Musical ability"],
+                answer: "Executive functions"
+            },
+            {
+                question: "What is impulsivity in the context of ADHD?",
+                options: ["Planning activities far in advance", "Acting on sudden urges without thinking", "Speaking very slowly and deliberately", "A dislike of trying new things"],
+                answer: "Acting on sudden urges without thinking"
+            },
+            {
+                question: "Which of the following is NOT one of the three main types of ADHD?",
+                options: ["Predominantly Inattentive", "Predominantly Hyperactive-Impulsive", "Combined Type", "Predominantly Anxious Type"],
+                answer: "Predominantly Anxious Type"
+            },
+            {
+                question: "At what stage of life is ADHD typically first diagnosed?",
+                options: ["Adulthood", "Old age", "Childhood", "Infancy"],
+                answer: "Childhood"
+            },
+            {
+                question: "A common challenge for individuals with ADHD is 'time blindness', which means:",
+                options: ["Inability to see clocks", "Perfectly estimating how long tasks will take", "Difficulty perceiving the passing of time", "An obsession with calendars"],
+                answer: "Difficulty perceiving the passing of time"
+            },
+            {
+                question: "What is 'hyperfocus' as it relates to ADHD?",
+                options: ["The inability to focus on anything", "An intense, prolonged focus on an interesting task", "Quickly switching between multiple tasks", "A fear of concentrating"],
+                answer: "An intense, prolonged focus on an interesting task"
+            },
+            {
+                question: "Effective ADHD treatment often involves a combination of:",
+                options: ["Medication and diet only", "Exercise only", "Behavioral therapy, medication, and education", "Avoiding difficult tasks"],
+                answer: "Behavioral therapy, medication, and education"
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const quizForm = document.getElementById('quiz-form');
+        const nextButton = document.getElementById('next-question-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const questionCounter = document.getElementById('question-counter');
+        const feedbackCorrect = document.getElementById('feedback-correct');
+        const feedbackIncorrect = document.getElementById('feedback-incorrect');
+        const finalScore = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-quiz-btn');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answerChecked = false;
+
+        function loadQuestion() {
+            answerChecked = false;
+            feedbackCorrect.style.display = 'none';
+            feedbackIncorrect.style.display = 'none';
+            nextButton.disabled = false;
+            nextButton.textContent = 'Next Question';
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionText.textContent = currentQuestion.question;
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach(option => {
+                const label = document.createElement('label');
+                label.className = "flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20 cursor-pointer transition-all duration-200 hover:border-primary/50 transform hover:scale-105";
+
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'adhd-symptom';
+                input.value = option;
+                input.className = "radio-custom h-6 w-6 appearance-none rounded-full border-2 border-muted-light dark:border-muted-dark checked:bg-primary checked:border-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50 focus:ring-offset-background-light dark:focus:ring-offset-background-dark";
+
+                const span = document.createElement('span');
+                span.className = "ml-4 text-lg font-medium";
+                span.textContent = option;
+
+                label.appendChild(input);
+                label.appendChild(span);
+                optionsContainer.appendChild(label);
+            });
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            finalScore.textContent = `${score}/${quizData.length}`;
+            const finalProgress = document.querySelector('.mb-8');
+            finalProgress.style.display = 'none';
+        }
+
+        quizForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (answerChecked) {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+                return;
+            }
+
+            const selectedOption = document.querySelector('input[name="adhd-symptom"]:checked');
+            if (!selectedOption) {
+                alert('Please select an answer!');
+                return;
+            }
+            
+            answerChecked = true;
+            const selectedValue = selectedOption.value;
+            const correctAnswer = quizData[currentQuestionIndex].answer;
+            
+            if (selectedValue === correctAnswer) {
+                score++;
+                feedbackCorrect.style.display = 'flex';
+                feedbackIncorrect.style.display = 'none';
+            } else {
+                feedbackIncorrect.style.display = 'flex';
+                feedbackCorrect.style.display = 'none';
+            }
+            
+            document.querySelectorAll('input[name="adhd-symptom"]').forEach(input => {
+                input.disabled = true;
+            });
+            
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextButton.textContent = 'Show Results';
+            }
+        });
+        
+        restartButton.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            resultsContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+            document.querySelector('.mb-8').style.display = 'block';
+            loadQuestion();
+        });
+
+        // Initial load
+        loadQuestion();
+
+        // Eye tracking functionality - Enhanced with proper webcam support
+        class EyeTracking {
+            constructor() {
+                this.isEnabled = false;
+                this.isCalibrated = false;
+                this.trackingMode = 'none'; // 'webcam' or 'mouse'
+                this.focusArea = null;
+                this.gazeData = [];
+                this.focusStatus = 'good';
+                this.lastGazeTime = Date.now();
+                this.offFocusStartTime = null;
+                this.focusCheckInterval = null;
+                this.webcamStream = null;
+                
+                // Canvas optimization
+                this.canvas = null;
+                this.ctx = null;
+                this.animationFrame = null;
+                this.gazeHistory = [];
+                this.maxHistoryLength = 30;
+                
+                // Performance optimization
+                this.lastRender = 0;
+                this.renderThrottle = 16; // ~60fps
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.setupCanvas();
+            }
+
+            initializeElements() {
+                this.toggleButton = document.getElementById('eye-tracking-toggle');
+                this.focusIndicator = document.getElementById('focus-indicator');
+                this.focusText = document.getElementById('focus-text');
+                this.gazeDot = document.getElementById('gaze-dot');
+                this.canvas = document.getElementById('gaze-canvas');
+                this.calibrationModal = document.getElementById('calibration-modal');
+                this.calibrationArea = document.getElementById('calibration-area');
+                this.startCalibrationBtn = document.getElementById('start-calibration');
+                this.skipCalibrationBtn = document.getElementById('skip-calibration');
+                this.testCameraBtn = document.getElementById('test-camera');
+                this.webcamContainer = document.getElementById('webcam-container');
+                this.webcamVideo = document.getElementById('webcam-video');
+                this.webcamStatus = document.getElementById('webcam-status');
+            }
+
+            setupCanvas() {
+                if (!this.canvas) return;
+                
+                this.resizeCanvas();
+                this.ctx = this.canvas.getContext('2d');
+                this.ctx.imageSmoothingEnabled = false;
+                
+                window.addEventListener('resize', this.throttle(() => {
+                    this.resizeCanvas();
+                    this.updateFocusArea();
+                }, 250));
+            }
+
+            resizeCanvas() {
+                if (!this.canvas) return;
+                
+                const dpr = window.devicePixelRatio || 1;
+                const rect = { width: window.innerWidth, height: window.innerHeight };
+                
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.canvas.style.width = rect.width + 'px';
+                this.canvas.style.height = rect.height + 'px';
+                
+                if (this.ctx) {
+                    this.ctx.scale(dpr, dpr);
+                }
+            }
+
+            throttle(func, limit) {
+                let inThrottle;
+                return function() {
+                    const args = arguments;
+                    const context = this;
+                    if (!inThrottle) {
+                        func.apply(context, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                }
+            }
+
+            bindEvents() {
+                this.toggleButton.addEventListener('click', () => {
+                    if (this.isEnabled) {
+                        this.disable();
+                    } else {
+                        this.enable();
+                    }
+                });
+
+                this.startCalibrationBtn.addEventListener('click', () => {
+                    this.startWebcamCalibration();
+                });
+
+                this.skipCalibrationBtn.addEventListener('click', () => {
+                    this.enableMouseTracking();
+                });
+
+                this.testCameraBtn.addEventListener('click', () => {
+                    this.testCameraAccess();
+                });
+            }
+
+            async testCameraAccess() {
+                const button = this.testCameraBtn;
+                const originalText = button.textContent;
+                
+                try {
+                    button.textContent = 'Testing...';
+                    button.disabled = true;
+
+                    // Check if APIs are available
+                    if (!navigator.mediaDevices) {
+                        throw new Error('MediaDevices API not supported');
+                    }
+
+                    if (!navigator.mediaDevices.getUserMedia) {
+                        throw new Error('getUserMedia not supported');
+                    }
+
+                    // List available devices
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    
+                    console.log('Available video devices:', videoDevices);
+
+                    if (videoDevices.length === 0) {
+                        throw new Error('No video input devices found');
+                    }
+
+                    // Test camera access
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 320, height: 240 }
+                    });
+
+                    // Test successful
+                    alert(`Camera test successful!\nFound ${videoDevices.length} camera(s).\nCheck browser console for device details.`);
+                    
+                    // Stop test stream
+                    stream.getTracks().forEach(track => track.stop());
+
+                } catch (error) {
+                    console.error('Camera test failed:', error);
+                    
+                    let message = 'Camera test failed:\n';
+                    if (error.name === 'NotAllowedError') {
+                        message += 'Permission denied. Please allow camera access.';
+                    } else if (error.name === 'NotFoundError') {
+                        message += 'No camera found.';
+                    } else if (error.name === 'NotSupportedError') {
+                        message += 'Camera not supported in this browser.';
+                    } else if (error.name === 'NotReadableError') {
+                        message += 'Camera is being used by another application.';
+                    } else {
+                        message += error.message;
+                    }
+                    
+                    alert(message);
+                } finally {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            }
+
+            async enable() {
+                this.calibrationModal.style.display = 'flex';
+            }
+
+            async startWebcamCalibration() {
+                try {
+                    // Check if getUserMedia is supported
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('Camera API not supported');
+                    }
+
+                    console.log('Requesting camera access...');
+                    
+                    // Request camera permission and get stream with fallback options
+                    const constraints = {
+                        video: {
+                            width: { ideal: 320, max: 640 },
+                            height: { ideal: 240, max: 480 },
+                            facingMode: 'user'
+                        },
+                        audio: false
+                    };
+
+                    this.webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    console.log('Camera access granted');
+                    
+                    // Set up webcam video
+                    this.webcamVideo.srcObject = this.webcamStream;
+                    this.webcamVideo.onloadedmetadata = () => {
+                        console.log('Video metadata loaded');
+                        this.webcamVideo.play().then(() => {
+                            console.log('Video playing');
+                            this.webcamContainer.style.display = 'block';
+                            this.webcamContainer.classList.add('active');
+                            this.webcamStatus.textContent = 'Camera Active';
+                            
+                            // Show calibration area after video starts
+                            this.calibrationArea.style.display = 'block';
+                            
+                            // Initialize WebGazer after video is ready
+                            this.initializeWebGazer().then(() => {
+                                // Start calibration process
+                                this.runCalibration();
+                            }).catch(error => {
+                                console.error('WebGazer initialization failed:', error);
+                                // Continue with basic tracking without WebGazer
+                                this.runCalibration();
+                            });
+                        }).catch(error => {
+                            console.error('Video play failed:', error);
+                            throw error;
+                        });
+                    };
+                    
+                } catch (error) {
+                    console.error('Webcam access error:', error);
+                    let errorMessage = 'Camera access failed. ';
+                    
+                    if (error.name === 'NotAllowedError') {
+                        errorMessage += 'Permission denied. Please allow camera access and try again.';
+                    } else if (error.name === 'NotFoundError') {
+                        errorMessage += 'No camera found on this device.';
+                    } else if (error.name === 'NotSupportedError') {
+                        errorMessage += 'Camera not supported on this browser.';
+                    } else {
+                        errorMessage += 'Please check your camera and permissions.';
+                    }
+                    
+                    alert(errorMessage + ' Switching to mouse tracking mode.');
+                    this.enableMouseTracking();
+                }
+            }
+
+            async initializeWebGazer() {
+                return new Promise((resolve, reject) => {
+                    try {
+                        // Configure WebGazer
+                        webgazer.setRegression('ridge')
+                            .setTracker('clmtrackr')
+                            .showPredictionPoints(false)
+                            .showFaceOverlay(false)
+                            .showFaceFeedbackBox(false)
+                            .setGazeListener((data, timestamp) => {
+                                if (data && this.isEnabled && this.trackingMode === 'webcam') {
+                                    this.handleGazeData(data, timestamp);
+                                }
+                            })
+                            .begin()
+                            .then(() => {
+                                // Hide WebGazer's default video elements
+                                setTimeout(() => {
+                                    const webgazerElements = [
+                                        '#webgazerVideoFeed',
+                                        '#webgazerFaceOverlay', 
+                                        '#webgazerFaceFeedbackBox'
+                                    ];
+                                    
+                                    webgazerElements.forEach(selector => {
+                                        const element = document.querySelector(selector);
+                                        if (element) {
+                                            element.style.display = 'none';
+                                        }
+                                    });
+                                }, 1000);
+                                
+                                resolve();
+                            })
+                            .catch(reject);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+
+            async runCalibration() {
+                const calibrationPoints = [
+                    { x: 60, y: 60 },   // Top-left
+                    { x: 260, y: 60 },  // Top-right
+                    { x: 160, y: 140 }, // Center
+                    { x: 60, y: 220 },  // Bottom-left
+                    { x: 260, y: 220 }  // Bottom-right
+                ];
+
+                let currentPoint = 0;
+                const area = this.calibrationArea;
+                
+                // Clear area and show instructions
+                area.innerHTML = `
+                    <div class="absolute inset-0 flex items-center justify-center text-center p-4">
+                        <div>
+                            <h4 class="font-bold mb-2">Calibration in Progress</h4>
+                            <p class="text-sm">Look directly at each blue dot and click it<br>
+                            Point ${currentPoint + 1} of ${calibrationPoints.length}</p>
+                        </div>
+                    </div>
+                `;
+
+                const showNextPoint = () => {
+                    if (currentPoint >= calibrationPoints.length) {
+                        this.finishWebcamCalibration();
+                        return;
+                    }
+
+                    // Clear previous instructions
+                    area.innerHTML = '';
+                    
+                    const point = calibrationPoints[currentPoint];
+                    const dot = document.createElement('div');
+                    dot.className = 'calibration-dot';
+                    dot.style.left = `${point.x - 10}px`;
+                    dot.style.top = `${point.y - 10}px`;
+                    
+                    // Add point counter
+                    const counter = document.createElement('div');
+                    counter.className = 'absolute top-2 left-2 text-xs text-muted-light dark:text-muted-dark';
+                    counter.textContent = `${currentPoint + 1}/${calibrationPoints.length}`;
+                    area.appendChild(counter);
+                    
+                    dot.addEventListener('click', () => {
+                        dot.classList.add('clicked');
+                        
+                        // Record calibration point for WebGazer
+                        if (webgazer && webgazer.isReady()) {
+                            const rect = area.getBoundingClientRect();
+                            const screenX = point.x + rect.left;
+                            const screenY = point.y + rect.top;
+                            
+                            // Add multiple validation points for better accuracy
+                            for (let i = 0; i < 5; i++) {
+                                setTimeout(() => {
+                                    webgazer.recordScreenPosition(screenX, screenY);
+                                }, i * 100);
+                            }
+                        }
+                        
+                        setTimeout(() => {
+                            currentPoint++;
+                            showNextPoint();
+                        }, 500);
+                    });
+
+                    area.appendChild(dot);
+                    
+                    // Auto-advance after 10 seconds if not clicked
+                    setTimeout(() => {
+                        if (dot.parentNode && !dot.classList.contains('clicked')) {
+                            currentPoint++;
+                            showNextPoint();
+                        }
+                    }, 10000);
+                };
+
+                showNextPoint();
+            }
+
+            finishWebcamCalibration() {
+                this.isCalibrated = true;
+                this.trackingMode = 'webcam';
+                this.calibrationModal.style.display = 'none';
+                this.enableWebcamTracking();
+            }
+
+            enableWebcamTracking() {
+                this.isEnabled = true;
+                this.focusIndicator.style.display = 'block';
+                this.canvas.style.display = 'block';
+                
+                this.updateButtonState('webcam');
+                this.updateFocusArea();
+                this.startRendering();
+                
+                this.focusCheckInterval = setInterval(() => {
+                    this.checkFocus();
+                }, 500);
+
+                setTimeout(() => {
+                    this.setFocusStatus('good', 'Eye tracking: Active 👁️');
+                }, 1000);
+            }
+
+            enableMouseTracking() {
+                this.trackingMode = 'mouse';
+                this.calibrationModal.style.display = 'none';
+                this.isEnabled = true;
+                this.focusIndicator.style.display = 'block';
+                this.canvas.style.display = 'block';
+                
+                this.updateButtonState('mouse');
+                this.updateFocusArea();
+                this.startRendering();
+                
+                document.addEventListener('mousemove', this.handleMouseMove);
+
+                this.focusCheckInterval = setInterval(() => {
+                    this.checkFocus();
+                }, 500);
+
+                setTimeout(() => {
+                    this.setFocusStatus('warning', 'Mouse tracking: Active 🖱️');
+                }, 1000);
+            }
+
+            updateButtonState(mode) {
+                const modeText = mode === 'webcam' ? 'Eye' : 'Mouse';
+                this.toggleButton.innerHTML = `<span class="material-symbols-outlined">visibility_off</span><span>Disable ${modeText} Tracking</span>`;
+                this.toggleButton.classList.remove('bg-primary/10', 'text-primary', 'hover:bg-primary/20');
+                this.toggleButton.classList.add('bg-danger/10', 'text-danger', 'hover:bg-danger/20');
+            }
+
+            disable() {
+                this.isEnabled = false;
+                this.focusIndicator.style.display = 'none';
+                this.canvas.style.display = 'none';
+                this.webcamContainer.style.display = 'none';
+                
+                this.toggleButton.innerHTML = '<span class="material-symbols-outlined">visibility</span><span>Enable Focus Tracking</span>';
+                this.toggleButton.classList.remove('bg-danger/10', 'text-danger', 'hover:bg-danger/20');
+                this.toggleButton.classList.add('bg-primary/10', 'text-primary', 'hover:bg-primary/20');
+
+                // Clear intervals and animations
+                if (this.focusCheckInterval) {
+                    clearInterval(this.focusCheckInterval);
+                }
+                
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                    this.animationFrame = null;
+                }
+
+                // Clear canvas
+                if (this.ctx) {
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+
+                // Stop WebGazer
+                if (typeof webgazer !== 'undefined' && webgazer.isReady()) {
+                    webgazer.end();
+                }
+
+                // Stop webcam stream
+                if (this.webcamStream) {
+                    this.webcamStream.getTracks().forEach(track => track.stop());
+                    this.webcamStream = null;
+                }
+
+                // Remove event listeners
+                document.removeEventListener('mousemove', this.handleMouseMove);
+                
+                // Clear data
+                this.gazeData = [];
+                this.gazeHistory = [];
+                this.trackingMode = 'none';
+            }
+
+            startRendering() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+                
+                const render = (timestamp) => {
+                    if (timestamp - this.lastRender > this.renderThrottle) {
+                        this.renderGaze();
+                        this.lastRender = timestamp;
+                    }
+                    
+                    if (this.isEnabled) {
+                        this.animationFrame = requestAnimationFrame(render);
+                    }
+                };
+                
+                this.animationFrame = requestAnimationFrame(render);
+            }
+
+            renderGaze() {
+                if (!this.ctx || !this.isEnabled) return;
+                
+                const dpr = window.devicePixelRatio || 1;
+                this.ctx.clearRect(0, 0, this.canvas.width / dpr, this.canvas.height / dpr);
+                
+                this.drawFocusArea();
+                this.drawGazeTrail();
+                this.drawCurrentGaze();
+            }
+
+            drawFocusArea() {
+                if (!this.focusArea) return;
+                
+                const { left, top, right, bottom } = this.focusArea;
+                const width = right - left;
+                const height = bottom - top;
+                
+                this.ctx.strokeStyle = 'rgba(19, 164, 236, 0.3)';
+                this.ctx.lineWidth = 3;
+                this.ctx.setLineDash([10, 5]);
+                this.ctx.strokeRect(left, top, width, height);
+                this.ctx.setLineDash([]);
+            }
+
+            drawGazeTrail() {
+                if (this.gazeHistory.length < 2) return;
+                
+                this.ctx.strokeStyle = 'rgba(19, 164, 236, 0.6)';
+                this.ctx.lineWidth = 2;
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.gazeHistory[0].x, this.gazeHistory[0].y);
+                
+                for (let i = 1; i < this.gazeHistory.length; i++) {
+                    const alpha = i / this.gazeHistory.length;
+                    this.ctx.globalAlpha = alpha * 0.5;
+                    this.ctx.lineTo(this.gazeHistory[i].x, this.gazeHistory[i].y);
+                }
+                
+                this.ctx.stroke();
+                this.ctx.globalAlpha = 1;
+            }
+
+            drawCurrentGaze() {
+                if (this.gazeHistory.length === 0) return;
+                
+                const current = this.gazeHistory[this.gazeHistory.length - 1];
+                
+                // Draw glow effect
+                const gradient = this.ctx.createRadialGradient(current.x, current.y, 0, current.x, current.y, 15);
+                gradient.addColorStop(0, 'rgba(19, 164, 236, 0.8)');
+                gradient.addColorStop(1, 'rgba(19, 164, 236, 0)');
+                
+                this.ctx.fillStyle = gradient;
+                this.ctx.beginPath();
+                this.ctx.arc(current.x, current.y, 15, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Draw center dot
+                this.ctx.fillStyle = 'rgba(19, 164, 236, 1)';
+                this.ctx.beginPath();
+                this.ctx.arc(current.x, current.y, 4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            handleGazeData(data, timestamp) {
+                if (!this.isEnabled) return;
+
+                this.lastGazeTime = timestamp;
+                
+                this.gazeHistory.push({ x: data.x, y: data.y, timestamp });
+                
+                if (this.gazeHistory.length > this.maxHistoryLength) {
+                    this.gazeHistory.shift();
+                }
+
+                this.gazeData.push({
+                    x: data.x,
+                    y: data.y,
+                    timestamp: timestamp
+                });
+
+                const threeSecondsAgo = timestamp - 3000;
+                if (this.gazeData.length > 100) {
+                    this.gazeData = this.gazeData.filter(d => d.timestamp > threeSecondsAgo).slice(-50);
+                }
+            }
+
+            updateFocusArea() {
+                const quizContainer = document.getElementById('quiz-container');
+                if (quizContainer && quizContainer.style.display !== 'none') {
+                    const rect = quizContainer.getBoundingClientRect();
+                    this.focusArea = {
+                        left: rect.left - 20,
+                        top: rect.top - 20,
+                        right: rect.right + 20,
+                        bottom: rect.bottom + 20
+                    };
+                }
+            }
+
+            checkFocus() {
+                if (!this.isEnabled || !this.focusArea) return;
+
+                const now = Date.now();
+                const recentGazeData = this.gazeData.filter(d => d.timestamp > now - 2000);
+
+                if (recentGazeData.length === 0) {
+                    this.setFocusStatus('alert', 'Focus: No tracking data');
+                    return;
+                }
+
+                let focusedCount = 0;
+                for (const gaze of recentGazeData) {
+                    if (gaze.x >= this.focusArea.left && 
+                        gaze.x <= this.focusArea.right && 
+                        gaze.y >= this.focusArea.top && 
+                        gaze.y <= this.focusArea.bottom) {
+                        focusedCount++;
+                    }
+                }
+
+                const focusRatio = focusedCount / recentGazeData.length;
+                const trackingIcon = this.trackingMode === 'webcam' ? '👁️' : '🖱️';
+
+                if (focusRatio >= 0.8) {
+                    this.setFocusStatus('good', `Focus: Excellent ${trackingIcon}`);
+                    this.offFocusStartTime = null;
+                } else if (focusRatio >= 0.5) {
+                    this.setFocusStatus('warning', `Focus: Good ${trackingIcon}`);
+                    this.offFocusStartTime = null;
+                } else {
+                    if (!this.offFocusStartTime) {
+                        this.offFocusStartTime = now;
+                    }
+                    
+                    const offFocusDuration = now - this.offFocusStartTime;
+                    if (offFocusDuration > 3000) {
+                        this.setFocusStatus('alert', `Focus: Look at quiz ${trackingIcon}`);
+                        this.showFocusReminder();
+                    } else {
+                        this.setFocusStatus('warning', `Focus: Getting distracted ${trackingIcon}`);
+                    }
+                }
+            }
+
+            setFocusStatus(status, text) {
+                if (this.focusStatus === status) return;
+                
+                this.focusStatus = status;
+                this.focusText.textContent = text;
+                this.focusIndicator.className = `focus-indicator focus-${status}`;
+            }
+
+            showFocusReminder() {
+                const quizContainer = document.getElementById('quiz-container');
+                quizContainer.classList.add('quiz-container-focused');
+                quizContainer.style.transform = 'scale(1.01)';
+                quizContainer.style.boxShadow = '0 0 25px rgba(19, 164, 236, 0.4)';
+                
+                setTimeout(() => {
+                    quizContainer.style.transform = 'scale(1)';
+                    quizContainer.style.boxShadow = '';
+                    setTimeout(() => {
+                        quizContainer.classList.remove('quiz-container-focused');
+                    }, 300);
+                }, 800);
+            }
+
+            handleMouseMove = (e) => {
+                this.handleGazeData({ x: e.clientX, y: e.clientY }, Date.now());
+            }
+        }
+
+        // Initialize eye tracking
+        const eyeTracking = new EyeTracking();
+
+        // Update focus area when question changes
+        const originalLoadQuestion = loadQuestion;
+        loadQuestion = function() {
+            originalLoadQuestion();
+            setTimeout(() => {
+                if (eyeTracking.isEnabled) {
+                    eyeTracking.updateFocusArea();
+                }
+            }, 100);
+        };
+
+    </script>
+</body>
+
+</html>

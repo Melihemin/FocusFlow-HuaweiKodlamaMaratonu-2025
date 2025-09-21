@@ -139,65 +139,64 @@
                     <div class="flex items-center text-sm theme-text-muted">
                         <a class="hover:text-primary" href="#">Lessons</a>
                         <span class="mx-2">/</span>
-                        <span class="theme-text">Lesson 1: Understanding ADHD</span>
+                        <span class="theme-text">Ders : Geometri 101</span>
                     </div>
                 </div>
                 <div class="mb-12">
-                    <h1 class="text-4xl font-bold tracking-tighter theme-text mb-2">Lesson 1: Understanding ADHD</h1>
-                    <p class="text-lg theme-text-muted">This lesson provides an overview of ADHD, including its
-                        symptoms, causes, and common misconceptions.</p>
+                    <h1 class="text-4xl font-bold tracking-tighter theme-text mb-2">Ders : Geometri 101</h1>
+                    <p class="text-lg theme-text-muted">Bu ders, geometriye giriş niteliğindedir ve temel kavramları
+                        içermektedir.</p>
                 </div>
                 <div class="space-y-16">
                     <div class="p-8 border rounded-xl theme-border calm-bg">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_1 }}</h3>
+                            <a href="/education/lessons/{{ lesson.id }}/unit/1"><h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_1 }}</h3></a>
                             <div class="flex items-center gap-2 text-sm calm-text">
                                 <span class="material-symbols-outlined">
                                     check_circle
                                 </span>
-                                <span>Completed</span>
+                                <span>Tamamlandı</span>
                             </div>
                         </div>
                         <div class="grid md:grid-cols-3 gap-8">
                             <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
+                                <h4 class="font-semibold theme-text mb-2">Ünite Özeti</h4>
                                 <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
+                                    Çizgi, nokta ve düzlem gibi temel geometrik kavramları tanıtıyoruz.
+                                    Onların ne işe yaradığına ve günlük yaşamda nasıl kullanıldığına bakıyoruz.
                                 </p>
                                 <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
+                                    <h4 class="font-semibold theme-text mb-3">Görevler</h4>
                                     <ul class="space-y-3">
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
+                                            <span class="theme-text-muted">Oku: Çizgi, Nokta ve Düzlem</span>
                                         </li>
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
+                                            <span class="theme-text-muted">İzle: Senin İçin Seçilmiş Konu Anlatımı</span>
                                         </li>
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
+                                            <span class="theme-text-muted">Test: Temel Kavramlar</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
+                                <h4 class="font-semibold theme-text mb-2">Detaylar</h4>
                                 <ul class="space-y-2 text-sm theme-text-muted">
                                     <li class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
+                                        <span>Tahmini Süre: <strong>25 mins</strong></span>
                                     </li>
                                     <li class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
+                                        <span>Ön koşul gereksinimi yok</span>
                                     </li>
                                 </ul>
                                 <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
+                                    <h4 class="font-semibold theme-text mb-2">Tamamlama Oranı</h4>
                                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
                                         <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
                                     </div>
@@ -208,54 +207,53 @@
                     </div>
                     <div class="p-8 border rounded-xl theme-border calm-bg">
                         <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_2 }}</h3>
+                            <a href="/education/lessons/{{ lesson.id }}/unit/2"><h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_2 }}</h3></a>
                             <div class="flex items-center gap-2 text-sm calm-text">
                                 <span class="material-symbols-outlined">
                                     check_circle
                                 </span>
-                                <span>Completed</span>
+                                <span>Tamamlandı</span>
                             </div>
                         </div>
                         <div class="grid md:grid-cols-3 gap-8">
                             <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
+                                <h4 class="font-semibold theme-text mb-2">Ünite Özeti</h4>
                                 <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
+                                    Açıların tanımını yapıyoruz ve temel açı türlerini (dar, dik, geniş) inceliyoruz.
+                                    Ayrıca, açıların nasıl ölçüldüğünü ve günlük yaşamda nerelerde kullanıldığını gösteriyoruz.
                                 </p>
                                 <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
+                                    <h4 class="font-semibold theme-text mb-3">Görevler</h4>
                                     <ul class="space-y-3">
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
+                                            <span class="theme-text-muted">Oku: Açı Türleri Nelerdir?</span>
                                         </li>
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
+                                            <span class="theme-text-muted">İzle: Senin İçin Seçilmiş Konu Anlatımı</span>
                                         </li>
                                         <li class="flex items-center">
                                             <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
+                                            <span class="theme-text-muted">Test: Açı Türleri ve Kavramlar</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
+                                <h4 class="font-semibold theme-text mb-2">Detaylar</h4>
                                 <ul class="space-y-2 text-sm theme-text-muted">
                                     <li class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
+                                        <span>Tahmini Süre: <strong>25 dk</strong></span>
                                     </li>
                                     <li class="flex items-center gap-2">
                                         <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
+                                        <span>Ön koşul gereksinimi yok</span>
                                     </li>
                                 </ul>
                                 <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
+                                    <h4 class="font-semibold theme-text mb-2">Tamamlanma Oranı</h4>
                                     <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
                                         <div class="bg-green-500 h-2.5 rounded-full" style="width: 50%"></div>
                                     </div>
@@ -264,471 +262,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_3 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_4 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_5 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_6 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_7 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_8 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_9 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-<div class="p-8 border rounded-xl theme-border calm-bg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-2xl font-bold calm-text">Unit: {{ lesson.unit_10 }}</h3>
-                            <div class="flex items-center gap-2 text-sm calm-text">
-                                <span class="material-symbols-outlined">
-                                    check_circle
-                                </span>
-                                <span>Completed</span>
-                            </div>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-8">
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold theme-text mb-2">Unit Summary</h4>
-                                <p class="theme-text-muted text-sm">
-                                    This unit introduces the fundamental concepts of Attention-Deficit/Hyperactivity
-                                    Disorder. We will explore what ADHD is, its historical context, and the overall
-                                    structure of this course.
-                                </p>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-3">Tasks</h4>
-                                    <ul class="space-y-3">
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Read: What is ADHD?</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Watch: Explainer Video (5 mins)</span>
-                                        </li>
-                                        <li class="flex items-center">
-                                            <span class="material-symbols-outlined text-green-500 mr-3">check_box</span>
-                                            <span class="theme-text-muted">Quiz: Key Concepts</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold theme-text mb-2">Details</h4>
-                                <ul class="space-y-2 text-sm theme-text-muted">
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">timer</span>
-                                        <span>Est. time: <strong>25 mins</strong></span>
-                                    </li>
-                                    <li class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-base">lock_open</span>
-                                        <span>No prerequisites</span>
-                                    </li>
-                                </ul>
-                                <div class="mt-6">
-                                    <h4 class="font-semibold theme-text mb-2">Progress</h4>
-                                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
-                                        <div class="bg-green-500 h-2.5 rounded-full" style="width: 100%"></div>
-                                    </div>
-                                    <p class="text-sm text-right mt-1 theme-text-muted">100%</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
 
                 </div>
             </div>

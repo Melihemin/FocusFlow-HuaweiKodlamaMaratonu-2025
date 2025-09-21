@@ -43,23 +43,8 @@
         .calibration-dot:hover { transform: scale(1.2); }
         .calibration-dot.clicked { background: #22c55e; animation: calibration-click 0.3s ease; }
         @keyframes calibration-click { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
-        
-        #webgazerVideoFeed, #webgazerFaceOverlay {
-            position: fixed !important;
-            top: 120px !important;
-            right: 20px !important;
-            width: 200px !important;
-            height: 150px !important;
-            border: 3px solid #13a4ec;
-            border-radius: 12px;
-            z-index: 999;
-            object-fit: cover;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        #webgazerFaceFeedbackBox { 
-            display: none !important; 
-        }
-
+        /* Hides WebGazer's default popups */
+        #webgazerVideoFeed, #webgazerFaceOverlay, #webgazerFaceFeedbackBox { display: none !important; }
     </style>
 </head>
 
@@ -74,7 +59,7 @@
                 <div class="flex items-center gap-4">
                     <button id="eye-tracking-toggle" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium">
                         <span class="material-symbols-outlined">visibility</span>
-                        <span>Odak Modu</span>
+                        <span>Enable Focus Tracking</span>
                     </button>
                 </div>
             </nav>
@@ -84,25 +69,15 @@
             <div class="max-w-3xl mx-auto">
                 <div id="progress-container" class="mb-8">
                     <div class="flex justify-between items-center mb-3">
-                        <p class="text-base font-medium text-muted-light dark:text-muted-dark">İlerlemen</p>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-1 text-base font-semibold text-muted-light dark:text-muted-dark" title="Geçen Süre">
-                                 <span class="material-symbols-outlined text-xl">timer</span>
-                                 <span id="timer">00:00</span>
-                            </div>
-                            <div class="flex items-center gap-1 text-base font-semibold text-muted-light dark:text-muted-dark" title="Sekme Değiştirme Sayısı">
-                                <span class="material-symbols-outlined text-xl">tab_move</span>
-                                <span id="tab-switch-counter">0</span>
-                           </div>
-                            <p id="question-counter" class="text-base font-bold text-primary">Soru 1 / 9</p>
-                        </div>
+                        <p class="text-base font-medium text-muted-light dark:text-muted-dark">Your Progress</p>
+                        <p id="question-counter" class="text-base font-bold text-primary">Question 1 of 10</p>
                     </div>
                     <div class="w-full bg-subtle-light dark:bg-subtle-dark rounded-full h-5 shadow-inner">
                         <div id="progress-bar" class="progress-bar-gradient h-5 rounded-full transition-all duration-500 ease-out" style="width: 10%"></div>
                     </div>
                 </div>
                 <div id="quiz-container" class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden"></div>
-                <div id="results-container" class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden" style="display: none;"></div>
+                <div id="results-container" class="relative bg-white dark:bg-subtle-dark/40 rounded-xl shadow-lg p-8 overflow-hidden text-center" style="display: none;"></div>
             </div>
         </main>
         
@@ -110,13 +85,13 @@
         <canvas id="gaze-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 998; display: none;"></canvas>
         <div id="calibration-modal" style="display: none;">
             <div class="bg-background-light dark:bg-background-dark rounded-xl p-8 text-center max-w-lg mx-4">
-                <h3 class="text-2xl font-bold mb-4">🎯 Odak Takibi Kurulumu</h3>
+                <h3 class="text-2xl font-bold mb-4">🎯 Eye Tracking Setup</h3>
                 <div id="calibration-area" class="relative w-80 h-60 mx-auto mb-6 bg-subtle-light/50 dark:bg-subtle-dark/30 rounded-lg" style="display: none;"></div>
                 <div id="setup-options">
-                    <p class="text-muted-light dark:text-muted-dark mb-6">Sınav sırasında odak takibi için bir yöntem seçin.</p>
+                    <p class="text-muted-light dark:text-muted-dark mb-6">Choose a method to monitor focus during the quiz.</p>
                     <div class="flex gap-4 justify-center">
-                        <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"><span class="material-symbols-outlined">videocam</span> Kamera Kullan</button>
-                        <button id="skip-calibration" class="bg-muted-light dark:bg-muted-dark text-white px-6 py-2 rounded-lg hover:opacity-80 flex items-center gap-2"><span class="material-symbols-outlined">mouse</span> Fare Kullan</button>
+                        <button id="start-calibration" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"><span class="material-symbols-outlined">videocam</span> Use Webcam</button>
+                        <button id="skip-calibration" class="bg-muted-light dark:bg-muted-dark text-white px-6 py-2 rounded-lg hover:opacity-80 flex items-center gap-2"><span class="material-symbols-outlined">mouse</span> Use Mouse</button>
                     </div>
                 </div>
             </div>
@@ -124,20 +99,15 @@
     </div>
 
     <script>
-        const quizData = [ { question: "İki farklı düzlem kesiştiğinde oluşan geometrik şekil nedir?", options: ["Nokta", "Düzlem", "Doğru", "Küre"], answer: "Doğru" }, { question: "Uzayda birbirini kesmeyen ve aynı düzlemde bulunmayan iki doğruya ne ad verilir?", options: ["Paralel doğrular", "Kesişen doğrular", "Aykırı doğrular", "Eğik doğrular"], answer: "Aykırı doğrular" }, { question: "Bir düzlemde 5 farklı nokta varsa ve bunlardan hiçbiri doğrusal değilse en fazla kaç farklı doğru çizilebilir?", options: ["5", "10", "15", "20"], answer: "10" }, { question: "Bir doğru üzerinde alınan 3 farklı nokta ile kaç farklı doğru çizilebilir?", options: ["1", "2", "3", "0"], answer: "1" }, { question: "Bir düzlemde 4 nokta varsa ve bunlardan 3’ü doğrusal ise kaç farklı doğru çizilebilir?", options: ["4", "5", "6", "7"], answer: "4" }, { question: "Bir doğru ve bu doğru üzerinde olmayan bir nokta verildiğinde kaç farklı düzlem tanımlanabilir?", options: ["0", "1", "2", "Sonsuz"], answer: "1" }, { question: "Aynı düzlemde bulunan 3 doğru birbirini kesmiyorsa bu doğrular hakkında ne söylenebilir?", options: ["Hepsi paraleldir", "İkisi paralel, biri eğiktir", "Hepsi dik kesişir", "Hepsi aynı noktadan geçer"], answer: "Hepsi paraleldir" }, { question: "Bir düzlemde en az kaç nokta doğrusal olmayan şekilde yerleştirilirse düzlem tanımlanabilir?", options: ["1", "2", "3", "4"], answer: "3" }, { question: "Bir doğru üzerinde olmayan bir noktadan o doğruya kaç farklı dik doğru çizilebilir?", options: ["0", "1", "2", "Sonsuz"], answer: "1" }];
+        const quizData = [ { question: "What is a key feature of ADHD?", options: ["Exceptional long-term memory", "Difficulty sustaining attention", "Aversion to colorful objects", "Speaking in a monotone voice"], answer: "Difficulty sustaining attention" }, { question: "The 'H' in ADHD stands for which of the following?", options: ["Hyper-focus", "Hypersensitivity", "Hyperactivity", "Honesty"], answer: "Hyperactivity" }, { question: "Which of these is a common strategy for managing ADHD symptoms?", options: ["Avoiding all forms of sugar", "Creating structured routines", "Sleeping more than 10 hours", "Working in a loud environment"], answer: "Creating structured routines" }, { question: "ADHD is primarily a disorder related to:", options: ["Physical strength", "Visual acuity", "Executive functions", "Musical ability"], answer: "Executive functions" }, { question: "What is impulsivity in the context of ADHD?", options: ["Planning activities far in advance", "Acting on sudden urges without thinking", "Speaking very slowly and deliberately", "A dislike of trying new things"], answer: "Acting on sudden urges without thinking" }, { question: "Which of the following is NOT one of the three main types of ADHD?", options: ["Predominantly Inattentive", "Predominantly Hyperactive-Impulsive", "Combined Type", "Predominantly Anxious Type"], answer: "Predominantly Anxious Type" }, { question: "At what stage of life is ADHD typically first diagnosed?", options: ["Adulthood", "Old age", "Childhood", "Infancy"], answer: "Childhood" }, { question: "A common challenge for individuals with ADHD is 'time blindness', which means:", options: ["Inability to see clocks", "Perfectly estimating how long tasks will take", "Difficulty perceiving the passing of time", "An obsession with calendars"], answer: "Difficulty perceiving the passing of time" }, { question: "What is 'hyperfocus' as it relates to ADHD?", options: ["The inability to focus on anything", "An intense, prolonged focus on an interesting task", "Quickly switching between multiple tasks", "A fear of concentrating"], answer: "An intense, prolonged focus on an interesting task" }, { question: "Effective ADHD treatment often involves a combination of:", options: ["Medication and diet only", "Exercise only", "Behavioral therapy, medication, and education", "Avoiding difficult tasks"], answer: "Behavioral therapy, medication, and education" } ];
         
         const quizContainer = document.getElementById('quiz-container');
         const resultsContainer = document.getElementById('results-container');
         const progressBar = document.getElementById('progress-bar');
         const questionCounter = document.getElementById('question-counter');
-        const timerElement = document.getElementById('timer');
-        const tabSwitchCounterElement = document.getElementById('tab-switch-counter');
         
         let currentQuestionIndex = 0;
         let score = 0;
-        let timerInterval = null;
-        let startTime = 0;
-        let tabSwitchCount = 0;
 
         class EyeTracking {
             constructor() { this.isEnabled = false; this.trackingMode = 'none'; this.focusArea = null; this.focusStatus = 'good'; this.offFocusStartTime = null; this.focusCheckInterval = null; this.lastPrediction = null; this.animationFrame = null; this.canvas = document.getElementById('gaze-canvas'); this.ctx = this.canvas.getContext('2d'); this.initializeElements(); this.bindEvents(); this.setupCanvas(); }
@@ -146,30 +116,22 @@
             setupCanvas() { this.resizeCanvas(); }
             resizeCanvas() { const dpr = window.devicePixelRatio || 1; this.canvas.width = window.innerWidth * dpr; this.canvas.height = window.innerHeight * dpr; this.canvas.style.width = `${window.innerWidth}px`; this.canvas.style.height = `${window.innerHeight}px`; this.ctx.scale(dpr, dpr); }
             enable() { this.calibrationModal.style.display = 'flex'; this.setupOptions.style.display = 'block'; this.calibrationArea.style.display = 'none'; }
-            async startWebcamCalibration() { this.setupOptions.style.display = 'none'; this.calibrationArea.style.display = 'block'; try { await webgazer.setGazeListener((data, ts) => this.handleGazeData(data)).showPredictionPoints(true).begin(); await this.runCalibration(); } catch (error) { console.error('Calibration Error:', error); alert('Kamera erişimi başlatılamadı. Lütfen kamera izni verdiğinizden emin olun. Fare moduna geçiliyor.'); this.enableMouseTracking(); } }
+            async startWebcamCalibration() { this.setupOptions.style.display = 'none'; this.calibrationArea.style.display = 'block'; try { await webgazer.setGazeListener((data, ts) => this.handleGazeData(data)).begin(); await this.runCalibration(); } catch (error) { console.error('Calibration Error:', error); alert('Could not start eye tracking. Ensure camera access is granted. Switching to mouse mode.'); this.enableMouseTracking(); } }
             runCalibration() { return new Promise(resolve => { const points = [{ x: 50, y: 50 }, { x: 250, y: 50 }, { x: 150, y: 120 }, { x: 50, y: 190 }, { x: 250, y: 190 }]; let current = 0; this.calibrationArea.innerHTML = ''; const nextPoint = () => { if (current >= points.length) { this.finishCalibration(); resolve(); return; } const p = points[current]; const dot = document.createElement('div'); dot.className = 'calibration-dot'; dot.style.left = `${p.x - 10}px`; dot.style.top = `${p.y - 10}px`; this.calibrationArea.appendChild(dot); dot.onclick = () => { dot.classList.add('clicked'); setTimeout(() => { this.calibrationArea.innerHTML = ''; current++; nextPoint(); }, 300); }; }; nextPoint(); }); }
-            async enableMouseTracking() { this.trackingMode = 'mouse'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); document.addEventListener('mousemove', this.handleMouseMove); this.setFocusStatus('warning', 'Fare Takibi 🖱️'); }
-            finishCalibration() { webgazer.showPredictionPoints(false); this.trackingMode = 'webcam'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); this.setFocusStatus('good', 'Göz Takibi 👁️'); }
+            async enableMouseTracking() { this.trackingMode = 'mouse'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); document.addEventListener('mousemove', this.handleMouseMove); this.setFocusStatus('warning', 'Mouse Tracking 🖱️'); }
+            finishCalibration() { this.trackingMode = 'webcam'; this.calibrationModal.style.display = 'none'; this.enableSharedTracking(); this.setFocusStatus('good', 'Eye Tracking 👁️'); }
             enableSharedTracking() { this.isEnabled = true; this.focusIndicator.style.display = 'flex'; this.canvas.style.display = 'block'; this.updateButtonState('disable'); this.updateFocusArea(); this.focusCheckInterval = setInterval(() => this.checkFocus(), 500); this.startRendering(); }
             disable() { this.isEnabled = false; this.focusIndicator.style.display = 'none'; this.canvas.style.display = 'none'; this.updateButtonState('enable'); if (this.focusCheckInterval) clearInterval(this.focusCheckInterval); if (this.animationFrame) cancelAnimationFrame(this.animationFrame); if (typeof webgazer !== 'undefined' && webgazer.isReady()) webgazer.end(); document.removeEventListener('mousemove', this.handleMouseMove); this.trackingMode = 'none'; }
-            updateButtonState(state) { if (state === 'disable') { this.toggleButton.innerHTML = `<span class="material-symbols-outlined">visibility_off</span><span>Odak Modu Kapat</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-primary\/\d+|text-primary|hover:bg-primary\/\d+/g, '') + ' bg-danger/10 text-danger hover:bg-danger/20'; } else { this.toggleButton.innerHTML = `<span class="material-symbols-outlined">visibility</span><span>Odak Modu</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-danger\/\d+|text-danger|hover:bg-danger\/\d+/g, '') + ' bg-primary/10 text-primary hover:bg-primary/20'; } }
+            updateButtonState(state) { if (state === 'disable') { this.toggleButton.innerHTML = `<span class="material-symbols-outlined">visibility_off</span><span>Disable Focus</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-primary\/\d+|text-primary|hover:bg-primary\/\d+/g, '') + ' bg-danger/10 text-danger hover:bg-danger/20'; } else { this.toggleButton.innerHTML = `<span class="material-symbols-outlined">visibility</span><span>Enable Focus</span>`; this.toggleButton.className = this.toggleButton.className.replace(/bg-danger\/\d+|text-danger|hover:bg-danger\/\d+/g, '') + ' bg-primary/10 text-primary hover:bg-primary/20'; } }
             handleMouseMove = (e) => { this.handleGazeData({ x: e.clientX, y: e.clientY }); };
             handleGazeData(data) { if (!this.isEnabled || !data) return; this.lastPrediction = data; }
             startRendering() { if (this.animationFrame) cancelAnimationFrame(this.animationFrame); const render = () => { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); if (this.isEnabled && this.lastPrediction) { this.drawGaze(); } this.animationFrame = requestAnimationFrame(render); }; this.animationFrame = requestAnimationFrame(render); }
             drawGaze() { const p = this.lastPrediction; this.ctx.fillStyle = 'rgba(19, 164, 236, 0.8)'; this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI); this.ctx.fill(); }
             updateFocusArea() { const rect = quizContainer.getBoundingClientRect(); this.focusArea = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }; }
-            checkFocus() { if (!this.isEnabled || !this.focusArea || !this.lastPrediction) { if (this.isEnabled) this.setFocusStatus('alert', 'Veri Yok'); return; } const p = this.lastPrediction; const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right && p.y >= this.focusArea.top && p.y <= this.focusArea.bottom); if (isFocused) { this.setFocusStatus('good', this.trackingMode === 'webcam' ? 'Odaklanıldı 👁️' : 'Fare Odaklı 🖱️'); this.offFocusStartTime = null; } else { if (!this.offFocusStartTime) this.offFocusStartTime = Date.now(); if (Date.now() - this.offFocusStartTime > 3000) { this.setFocusStatus('alert', 'Yeniden Odaklan!'); } else { this.setFocusStatus('warning', 'Dikkat Dağınık...'); } } }
+            checkFocus() { if (!this.isEnabled || !this.focusArea || !this.lastPrediction) { if (this.isEnabled) this.setFocusStatus('alert', 'No Data'); return; } const p = this.lastPrediction; const isFocused = (p.x >= this.focusArea.left && p.x <= this.focusArea.right && p.y >= this.focusArea.top && p.y <= this.focusArea.bottom); if (isFocused) { this.setFocusStatus('good', this.trackingMode === 'webcam' ? 'Eye Tracking 👁️' : 'Mouse Tracking 🖱️'); this.offFocusStartTime = null; } else { if (!this.offFocusStartTime) this.offFocusStartTime = Date.now(); if (Date.now() - this.offFocusStartTime > 3000) { this.setFocusStatus('alert', 'Refocus!'); } else { this.setFocusStatus('warning', 'Distracted...'); } } }
             setFocusStatus(status, text) { if (this.focusStatus === status) return; this.focusStatus = status; this.focusText.textContent = text; this.focusIndicator.className = `focus-indicator focus-${status}`; }
         }
         
-        function startTimer() { if (timerInterval) clearInterval(timerInterval); startTime = Date.now(); timerInterval = setInterval(updateTimerDisplay, 1000); }
-        function stopTimer() { clearInterval(timerInterval); }
-        function updateTimerDisplay() { const elapsedTime = Math.floor((Date.now() - startTime) / 1000); const minutes = String(Math.floor(elapsedTime / 60)).padStart(2, '0'); const seconds = String(elapsedTime % 60).padStart(2, '0'); timerElement.textContent = `${minutes}:${seconds}`; }
-
-        function handleVisibilityChange() { if (document.hidden) { tabSwitchCount++; tabSwitchCounterElement.textContent = tabSwitchCount; } }
-        function startTabSwitchTracking() { tabSwitchCount = 0; tabSwitchCounterElement.innerHTML = `Sekme Değiştirme: <span id="tab-switch-counter">${tabSwitchCount}</span>`; document.addEventListener('visibilitychange', handleVisibilityChange); }
-        function stopTabSwitchTracking() { document.removeEventListener('visibilitychange', handleVisibilityChange); }
-
         function loadQuestion() {
             updateProgress();
             const currentQuestion = quizData[currentQuestionIndex];
@@ -183,9 +145,9 @@
                     </div>
                     <form id="quiz-form">
                         <div class="space-y-4">${currentQuestion.options.map(option => `<label class="flex items-center p-4 rounded-lg border-2 border-subtle-light dark:border-subtle-dark has-[:checked]:border-primary has-[:checked]:bg-primary/10 cursor-pointer transition-all hover:border-primary/50"><input type="radio" name="answer" value="${option}" class="radio-custom h-6 w-6 appearance-none rounded-full border-2"><span class="ml-4 text-lg font-medium">${option}</span></label>`).join('')}</div>
-                        <div class="mt-8 flex justify-end items-center">
-                            <div class="min-h-[72px] mr-auto"><div id="feedback"></div></div>
-                            <button type="submit" class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90">Cevapla</button>
+                        <div class="mt-8 flex justify-between items-center">
+                            <div class="min-h-[72px]"><div id="feedback"></div></div>
+                            <button type="submit" class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90">Submit Answer</button>
                         </div>
                     </form>
                 </div>`;
@@ -197,17 +159,17 @@
             e.preventDefault();
             const form = e.target;
             const selectedOption = form.querySelector('input[name="answer"]:checked');
-            if (!selectedOption) { alert('Lütfen bir cevap seçin!'); return; }
+            if (!selectedOption) { alert('Please select an answer!'); return; }
             form.querySelectorAll('input').forEach(input => input.disabled = true);
             const submitButton = form.querySelector('button[type="submit"]');
-            submitButton.textContent = 'Sonraki...';
+            submitButton.textContent = 'Continuing...';
             submitButton.disabled = true;
 
             const isCorrect = selectedOption.value === quizData[currentQuestionIndex].answer;
             if (isCorrect) score++;
             
             const feedbackEl = document.getElementById('feedback');
-            feedbackEl.innerHTML = `<div class="bg-${isCorrect ? 'success' : 'danger'}/10 border-2 border-${isCorrect ? 'success' : 'danger'} text-${isCorrect ? 'success' : 'danger'} rounded-lg p-4 flex items-center gap-3 animate-tada"><span class="material-symbols-outlined text-3xl">${isCorrect ? 'celebration' : 'error'}</span><div><p class="font-bold">${isCorrect ? "Doğru!" : "Maalesef Yanlış."}</p></div></div>`;
+            feedbackEl.innerHTML = `<div class="bg-${isCorrect ? 'success' : 'danger'}/10 border-2 border-${isCorrect ? 'success' : 'danger'} text-${isCorrect ? 'success' : 'danger'} rounded-lg p-4 flex items-center gap-3 animate-tada"><span class="material-symbols-outlined text-3xl">${isCorrect ? 'celebration' : 'error'}</span><div><p class="font-bold">${isCorrect ? "That's right!" : "Not quite."}</p></div></div>`;
             
             setTimeout(() => {
                 currentQuestionIndex++;
@@ -216,73 +178,15 @@
         }
 
         function updateProgress() {
-            progressBar.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
-            questionCounter.textContent = `Soru ${currentQuestionIndex + 1} / ${quizData.length}`;
+            progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of 10`;
         }
 
         function showResults() {
-            stopTimer();
-            stopTabSwitchTracking();
             quizContainer.style.display = 'none';
             document.getElementById('progress-container').style.display = 'none';
-            
-            // Calculate final stats
-            const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-            const seconds = String(totalSeconds % 60).padStart(2, '0');
-            const formattedTotalTime = `${minutes}:${seconds}`;
-            const focusScore = Math.max(0, Math.min(98, 80 + score - (tabSwitchCount * 5))); // Static calculation
-            
-            // Static topic analysis
-            const strengths = ["Doğru ve Düzlem İlişkisi", "Noktaların Belirttiği Doğrular"];
-            const weaknesses = ["Aykırı Doğrular", "Doğrusallık Kavramı"];
-            
             resultsContainer.style.display = 'block';
-            resultsContainer.innerHTML = `
-                <div class="relative z-10 text-left">
-                    <h2 class="text-3xl font-bold mb-2 text-center">Sınav Sonucu</h2>
-                    <p class="text-center text-muted-light dark:text-muted-dark mb-6">İşte performansının detaylı bir analizi.</p>
-            
-                    <div class="bg-primary/10 dark:bg-primary/20 p-6 rounded-xl text-center mb-6">
-                        <p class="text-sm font-medium text-primary uppercase">Toplam Puan</p>
-                        <p class="text-6xl font-black text-primary">${score}/${quizData.length}</p>
-                    </div>
-            
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div class="bg-subtle-light/50 dark:bg-subtle-dark/40 p-4 rounded-lg text-center flex flex-col justify-center">
-                            <p class="text-sm font-medium text-muted-light dark:text-muted-dark">Toplam Süre</p>
-                            <p class="text-3xl font-bold">${formattedTotalTime}</p>
-                        </div>
-                        <div class="bg-subtle-light/50 dark:bg-subtle-dark/40 p-4 rounded-lg text-center flex flex-col justify-center">
-                            <p class="text-sm font-medium text-muted-light dark:text-muted-dark">Sekme Değiştirme</p>
-                            <p class="text-3xl font-bold">${tabSwitchCount}</p>
-                        </div>
-                        <div class="bg-subtle-light/50 dark:bg-subtle-dark/40 p-4 rounded-lg text-center flex flex-col justify-center">
-                            <p class="text-sm font-medium text-muted-light dark:text-muted-dark">Odak Skoru</p>
-                            <p class="text-3xl font-bold text-success">${focusScore}%</p>
-                        </div>
-                    </div>
-            
-                    <h3 class="text-2xl font-bold mb-4 text-center">Konu Analizi</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-bold text-lg text-success mb-3 flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Güçlü Yönlerin</h4>
-                            <ul class="space-y-2">
-                                ${strengths.map(topic => `<li class="p-3 bg-success/10 rounded-md text-sm">${topic}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-lg text-warning mb-3 flex items-center gap-2"><span class="material-symbols-outlined">lightbulb</span> Geliştirilecek Alanlar</h4>
-                            <ul class="space-y-2">
-                                 ${weaknesses.map(topic => `<li class="p-3 bg-warning/10 rounded-md text-sm">${topic}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 text-center">
-                         <button id="restart-quiz-btn" class="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90">Tekrar Dene</button>
-                    </div>
-                </div>`;
+            resultsContainer.innerHTML = `<div class="relative z-10"><h2 class="text-4xl font-bold mb-4">Quiz Complete!</h2><p class="text-6xl font-black text-primary mb-8">${score}/${quizData.length}</p><button id="restart-quiz-btn" class="bg-primary text-white font-bold py-3 px-8 rounded-lg">Try Again</button></div>`;
             
             document.getElementById('restart-quiz-btn').addEventListener('click', () => {
                 currentQuestionIndex = 0;
@@ -292,16 +196,12 @@
                 document.getElementById('progress-container').style.display = 'block';
                 if (eyeTracking.isEnabled) eyeTracking.disable();
                 loadQuestion();
-                startTimer();
-                startTabSwitchTracking();
             });
             if (eyeTracking.isEnabled) eyeTracking.disable();
         }
 
         const eyeTracking = new EyeTracking();
         loadQuestion();
-        startTimer();
-        startTabSwitchTracking();
     </script>
 </body>
 </html>

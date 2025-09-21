@@ -60,7 +60,8 @@ async def get_unit_lesson_detail(request: Request, unit_id: int, lesson_id: int,
         "request": request,
         "unit_id": unit_id,
         "lesson_id": lesson_id,
-        "response": response # Pass the RAG-generated explanation
+        "response": response,
+        "lesson": lesson # Pass the RAG-generated explanation
     })
 
 @router.get("/user/{user_id}/statistics", summary="Get User Learning Statistics")
@@ -68,3 +69,11 @@ async def get_user_statistics(request: Request, user_id: int, db: db_dependency)
 
 
     return templates.TemplateResponse("dashboard.html", {"request": request, "user_id": user_id})
+
+
+@router.get("/quiz/{lesson_id}", summary="Get Quiz for a Lesson")
+async def get_quiz(request: Request, lesson_id: int, db: db_dependency):
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        return JSONResponse(status_code=404, content={"message": "Lesson not found"})
+    return templates.TemplateResponse("quiz.html", {"request": request, "lesson": lesson})
