@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: focusflow-backend
+  labels:
+    app: focusflow
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: focusflow
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: focusflow
+        tier: backend
+    spec:
+      containers:
+      - name: backend-api
+        image: registry.hub.docker.com/codenvision/focusflow-backend:1.0.2
+        ports:
+        - containerPort: 8000
+        env:
+          - name: DB_HOST
+            value: "ff-db.cce.rds.huaweicloud.com"
+          - name: DB_USER
+            value: "ff_admin"
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: focusflow-secrets
+                key: DB_PASSWORD
+          - name: OBS_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: focusflow-secrets
+                key: OBS_ACCESS_KEY
+          - name: OBS_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: focusflow-secrets
+                key: OBS_SECRET_KEY
+          - name: GEMINI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: focusflow-secrets
+                key: GEMINI_API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: focusflow-backend-service
+spec:
+  selector:
+    app: focusflow
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: focusflow-frontend
+  labels:
+    app: focusflow
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: focusflow
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: focusflow
+        tier: frontend
+    spec:
+      containers:
+      - name: frontend-web
+        image: registry.hub.docker.com/codenvision/focusflow-frontend:1.0.2
+        ports:
+        - containerPort: 3000
+        env:
+          - name: REACT_APP_API_URL
+            value: "http://focusflow-backend-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: focusflow-frontend-service
+spec:
+  selector:
+    app: focusflow
+    tier: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer
