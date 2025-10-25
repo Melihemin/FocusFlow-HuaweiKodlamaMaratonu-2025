@@ -19,10 +19,8 @@ FocusFlow is designed to improve the quality of life and learning for students w
     * [Cloud Architecture (Huawei Cloud)](#cloud-architecture-huawei-cloud)
     * [AI Architecture (RAG)](#ai-architecture-rag)
 * [Tech Stack](#-tech-stack)
-* [Screenshots](#-screenshots)
 * [Demo](#-demo)
 * [Our Team](#-our-team)
-* [Installation](#-installation)
 * [License](#-license)
 
 ## 🎯 About The Project
