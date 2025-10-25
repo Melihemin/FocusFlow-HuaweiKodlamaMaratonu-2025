@@ -23,13 +23,13 @@ FocusFlow is designed to improve the quality of life and learning for students w
 * [Our Team](#-our-team)
 * [License](#-license)
 
-## 🎯 About The Project
+## About The Project
 
 Students with ADHD often struggle to maintain focus in traditional educational settings. FocusFlow addresses this challenge by creating a unique learning environment for each student. Our platform actively measures a user's focus level in real-time and dynamically adapts the content (text, videos, and quizzes) to match their attention span and learning style.
 
 Our goal is to contribute to equality in education by enabling every student to reach their full potential.
 
-## ✨ Key Features
+## Key Features
 
 * **Personalized Learning (RAG)**: Generates a unique stream of educational content using a RAG (Retrieval-Augmented Generation) model, tailored to the student's learning pace, focus span, and ADHD profile.
 * **Eye-Tracking & Focus Measurement**: An active focus module that tracks eye and mouse movements during study sessions to analyze the student's attention level in real-time.
@@ -37,7 +37,7 @@ Our goal is to contribute to equality in education by enabling every student to 
 * **Gamified Experience**: Engages students and boosts motivation through point systems, competitive leaderboards, and achievement badges.
 * **Data-Driven & GDPR/KVKK Compliant**: Securely analyzes all user data to provide the most accurate content recommendations within a privacy-compliant framework.
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 Our platform is built on two robust, scalable, and high-performance architectures: a Huawei Cloud infrastructure and a RAG-based AI model.
 
@@ -78,7 +78,7 @@ Content personalization is achieved through our RAG (Retrieval-Augmented Generat
 <img width="1404" height="761" alt="Ekran Resmi 2025-10-25 12 58 55" src="https://github.com/user-attachments/assets/1f071299-5136-401c-a213-18132f9b8878" />
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category | Technology |
 | :--- | :--- |
@@ -90,12 +90,12 @@ Content personalization is achieved through our RAG (Retrieval-Augmented Generat
 | **Artificial Intelligence** | RAG, Gemini 1.5 Flash, FAISS |
 | **AI/ML Monitoring** | LangChain / LangSmith |
 
-## 📺 Demo
+## Demo
 
 Watch our full project demo, including a detailed walkthrough of the features and architecture, on YouTube:
 
 [**FocusFlow | Code N' Vision - Project Explanation (YouTube)**](https://www.youtube.com/watch?v=KnRb824DJA8)
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
