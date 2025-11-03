@@ -4,7 +4,7 @@ from typing import List
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
-# LangChain Kütüphaneleri
+
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
@@ -106,6 +106,6 @@ def generate_rag_answer(request_text: str) -> str:
         | parser
     )
     
-    # Zinciri, kullanıcıdan gelen istek metniyle çalıştır
+  
     response_text = rag_chain.invoke(request_text)
     return response_text
